@@ -8,7 +8,7 @@ database_url = URL.create(
     username=settings.oracle_user,
     password=settings.oracle_password,
     host="localhost",
-    port=1521,
+    port=1522,  # 클라우드 DB로 가는 SSH 터널 포트 (ssh -L 1522:127.0.0.1:1521 ...)
     query={"service_name": settings.oracle_dsn},
 )
 
