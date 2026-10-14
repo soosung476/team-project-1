@@ -1,0 +1,19 @@
+# Python 3.14 기준
+# 설치: pip install -r requirements.txt
+
+# 웹 프레임워크 (uvicorn, fastapi CLI, python-multipart 포함)
+fastapi[standard]==0.143.0
+
+# 설정 / 검증
+pydantic==2.14.1
+pydantic-settings==2.15.0
+email-validator==2.3.0
+
+# DB (Oracle)
+SQLAlchemy==2.1.4
+oracledb==26.0.1
+alembic==1.20.0
+
+# 인증 (JWT, 비밀번호 해시 - PasswordHash.recommended()는 argon2 필요)
+PyJWT==2.15.1
+pwdlib[argon2]==0.3.1
