@@ -1,0 +1,2 @@
+class UserCredentialsException(Exception):
+    pass
