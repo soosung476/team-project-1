@@ -7,9 +7,7 @@ from alembic import context
 
 # 데이터베이스와 연동하는 정보 추가
 from db.database import engine, Base
-from features.board.models import Board, Board_Views
-from features.user.models import User
-from features.comment.models import Comment
+import db.models  # noqa: F401  (모든 모델을 등록해야 autogenerate가 테이블을 찾음)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
