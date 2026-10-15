@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, status , Depends
 from features.user.models import User
-from features.notice.service import create_notice,update_notice
+from features.notice.service import create_notice,update_notice,remove_notice
 from sqlalchemy.orm import Session
 from db.database import get_db
 from core.dependencies import get_current_user,get_admin_user,get_db,get_user
 from features.notice.schema import NoticeCreate, NoticeResponse,NoticeUpdate,NoticeListResponse,UserResponse
-from features.notice.exceptions import NotMatchedPinnedException, NoticeNotFoundException
+from features.notice.exceptions import NotMatchedPinnedException, NoticeNotFoundException, UserCredentialException
 
 notice_router = APIRouter(prefix="/notice" , tags=["Notices"])
 
@@ -13,6 +13,7 @@ notice_router = APIRouter(prefix="/notice" , tags=["Notices"])
 async def post_notice(
     data:NoticeCreate,
     db:Session = Depends(get_db),
+    # get_admin_user 에서 알아서 403 출력
     current_user:User=Depends(get_admin_user)
 ):
 
@@ -40,6 +41,19 @@ async def put_notice(
         )
     return {"message":f"{id} 번이 수정되었습니다."} 
 
-# @notice_router.delete
+@notice_router.delete("/{id}",response_model=dict)
+async def delete_notice(
+    id:int,
+    db:Session = Depends(get_db),
+    # 관리자 권한 확인용 호출
+    current_user:User=Depends(get_admin_user)
+):
+    try:
+        id=remove_notice(id=id,db=db)
+    except NoticeNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,detail="공지사항을 찾을 수 없습니다."
+        )
+    return {"message":f"{id}번이 삭제되었습니다."}
 
 # @notice_router.get

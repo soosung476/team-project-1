@@ -18,11 +18,8 @@ def update_notice(db:Session,data:NoticeUpdate,current_user:User,id:int):
 
     # 공지사항 없을때
     if notice is None:
-        NoticeNotFoundException
+        raise NoticeNotFoundException
 
-    # 작성자가 아닐때
-    if notice.author_id != current_user.id:
-        raise UserCredentialException
     # 일부 내용만 수정할 때(수정할 내용이 있다면)
     if data.title is not None:
         notice.title = data.title
@@ -32,18 +29,25 @@ def update_notice(db:Session,data:NoticeUpdate,current_user:User,id:int):
         # Y 또는 N만 받기
         if data.is_pinned == "Y" or data.is_pinned == "N": 
             notice.is_pinned = data.is_pinned
-        else:
+        else: 
             raise NotMatchedPinnedException
             
     db.commit()
     return id
     
+def remove_notice(db:Session,id:int):
+    notice = db.get(Notice, id)
+
+    if notice is None:
+        raise NoticeNotFoundException
+
+    db.delete(notice)
+    db.commit()
+    return id
+
+
 def get_notices():
     pass
-
-def delete_notice():
-    pass
-
 
 def get_notice():
     pass
