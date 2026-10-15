@@ -85,7 +85,7 @@ const BoardDetail = () => {
   }
   return (
     <div>
-      <div className="mb-8 text-sm text-slate-400">
+      <div className="mb-3 text-sm text-slate-400">
         Home <span className="mx-2">/</span>
         게시판 <span className="mx-2">/</span>
         <span className="text-slate-600">게시글</span>
@@ -93,10 +93,10 @@ const BoardDetail = () => {
 
       <article className="rounded-xl border border-slate-200 bg-white">
         {/* Header */}
-        <div className="border-b border-slate-200 px-8 py-7">
-          <h1 className="text-2xl font-bold">{board.title}</h1>
+        <div className="border-b border-slate-200 px-6 py-4">
+          <h1 className="text-xl font-bold">{board.title}</h1>
 
-          <div className="mt-4 flex items-center gap-4 text-sm text-slate-400">
+          <div className="mt-2 flex items-center gap-4 text-sm text-slate-400">
             <span className="font-medium text-slate-600">
               {board.user.name}
             </span>
@@ -106,14 +106,14 @@ const BoardDetail = () => {
         </div>
 
         {/* Content */}
-        <div className="min-h-100 px-8 py-10 leading-8 text-slate-700">
+        <div className="min-h-40 px-6 py-5 leading-7 text-slate-700">
           <p className="whitespace-pre-wrap wrap-break-words">
             {board.contents}
           </p>
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-between border-t border-slate-200 px-8 py-5">
+        <div className="flex justify-between border-t border-slate-200 px-6 py-3">
           <Link
             to={`/boards/?page=${currentPage}&size=${size}`}
             className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"

@@ -66,15 +66,15 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm">
+    <div className="flex items-center justify-center px-4 py-6">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm">
         <h1 className="mb-2 text-2xl font-bold">회원가입</h1>
 
-        <p className="mb-8 text-sm text-gray-500">
+        <p className="mb-5 text-sm text-gray-500">
           Dev Board 계정을 만들어보세요.
         </p>
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="mb-1 block text-sm font-medium">이메일</label>
 
@@ -84,7 +84,7 @@ const SignupPage = () => {
               value={email}
               onChange={handleChange}
               required
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:border-indigo-500"
+              className="w-full rounded-lg border px-3 py-2 outline-none focus:border-indigo-500"
             />
           </div>
           <div>
@@ -96,7 +96,7 @@ const SignupPage = () => {
               value={name}
               onChange={handleChange}
               required
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:border-indigo-500"
+              className="w-full rounded-lg border px-3 py-2 outline-none focus:border-indigo-500"
             />
           </div>
 
@@ -109,7 +109,7 @@ const SignupPage = () => {
               value={password}
               onChange={handleChange}
               required
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:border-indigo-500"
+              className="w-full rounded-lg border px-3 py-2 outline-none focus:border-indigo-500"
             />
           </div>
 
@@ -124,26 +124,26 @@ const SignupPage = () => {
               value={passwordCheck}
               onChange={handleChange}
               required
-              className="w-full rounded-lg border px-4 py-3 outline-none focus:border-indigo-500"
+              className="w-full rounded-lg border px-3 py-2 outline-none focus:border-indigo-500"
             />
           </div>
 
           {/* 가입 실패시 에러 메세지 보여주기 */}
           {errorMessage && (
-            <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+            <div className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
               {errorMessage}
             </div>
           )}
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700"
+            className="w-full rounded-lg bg-indigo-600 py-2.5 font-semibold text-white hover:bg-indigo-700"
           >
             회원가입
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-5 text-center text-sm text-gray-500">
           이미 계정이 있으신가요?
           <Link
             to="/users/signin"
