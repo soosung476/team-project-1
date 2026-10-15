@@ -1,31 +1,21 @@
 from fastapi import APIRouter, HTTPException, status , Depends
-from user.models import User
-from service import create_notice
+from features.user.models import User
+from features.notice.service import create_notice
 from sqlalchemy.orm import Session
 from db.database import get_db
-from exceptions import UserCredentialException
+from core.dependencies import get_current_user,get_admin_user,get_db,get_user
+from features.notice.schema import NoticeCreate
 
-notice_router = APIRouter.get(tags=["Notices"])
+notice_router = APIRouter(prefix="/notice" , tags=["Notices"])
 
-# 로그인 기능 추가 시 role에 따른 생성제한 추가
-@notice_router.post("",response_model=create_notice)
+@notice_router.post("",response_model=dict)
 async def post_notice(
-    data:create_notice,
+    data:NoticeCreate,
     db:Session = Depends(get_db),
-    current_user:User=Depends()
+    current_user:User=Depends(get_admin_user)
 ):
-    if current_user.role != 'ADMIN':
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="유효하지 않은 사용자입니다."
-        )
 
-    try:
-        new_notice = create_notice(db=db,data=data,current_user=current_user)
-    except UserCredentialException:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="유효하지 않은 사용자입니다.")
+    new_notice = create_notice(db=db,data=data,current_user=current_user)
     
     return {"message":f"{new_notice.id} 번이 생성되었습니다."}  
 
