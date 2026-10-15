@@ -49,7 +49,7 @@ const SignupPage = () => {
 
     try {
       const result = await signup({ email, password, name });
-      alert(`${result.user_id}님 ${result.message}`);
+      alert(`${result.id}님 ${result.message}`);
       navigate("/users/signin");
     } catch (error) {
       if (axios.isAxiosError(error)) {
