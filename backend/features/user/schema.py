@@ -29,3 +29,8 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class UserCreate(BaseModel):
+    name:str
+    password:Password
+    email:EmailStr
