@@ -3,3 +3,6 @@ class UserCredentialException(Exception):
 
 class NoticeNotFoundException(Exception):
     pass
+
+class NotMatchedPinnedException(Exception):
+    pass
