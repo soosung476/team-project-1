@@ -124,7 +124,7 @@ const BoardDetail = () => {
           <div className="flex gap-2">
             <button
               className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
-              disabled={user?.user_id !== board.user_id}
+              disabled={user?.id !== board.user_id}
               onClick={() =>
                 navigate({
                   pathname: `/boards/${id}/edit`,
@@ -137,7 +137,7 @@ const BoardDetail = () => {
 
             <button
               className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
-              disabled={user?.user_id !== board.user_id}
+              disabled={user?.id !== board.user_id}
               onClick={() => {
                 if (confirm("정말로 삭제하시겠습니까?")) {
                   deleteClick(id);

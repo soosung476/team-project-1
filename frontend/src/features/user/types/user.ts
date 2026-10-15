@@ -3,9 +3,11 @@ export type UserLogin = {
   password: string;
 };
 export type User = {
-  user_id: number;
+  id: number;
   email: string;
   name: string;
+  role: string;
+  
 };
 
 export type UserSignup = {

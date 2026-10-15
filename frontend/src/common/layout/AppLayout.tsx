@@ -4,7 +4,7 @@ import { useAuth } from "../../features/user/context/AuthContext";
 const AppLayout = () => {
   const navigate = useNavigate();
 
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, user } = useAuth();
   return (
     // 화면 높이(h-screen)를 위에서부터 헤더 → 메뉴 → 컨텐츠 → 푸터 순서로 세로(flex-col)로 나눔
     <div className="flex h-screen flex-col bg-slate-50 text-slate-900">
@@ -14,22 +14,33 @@ const AppLayout = () => {
           <NavLink to="/" className="text-lg font-bold tracking-tight">
             💻 SimpleWare
           </NavLink>
+          {/* 오른쪽 묶음: 관리자페이지 + 로그인/로그아웃 (div로 묶어야 둘이 붙어서 오른쪽에 섬) */}
+          <div className="flex items-center gap-3">
+            {user?.role == "ADMIN" && isLoggedIn && (
+              <button
+                className="text-xs text-slate-500 hover:text-slate-900 cursor-pointer"
+                onClick={() => navigate("/admin/users")}
+              >
+                관리자페이지
+              </button>
+            )}
 
-          {!isLoggedIn ? (
-            <button
-              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium hover:bg-slate-50 cursor-pointer"
-              onClick={() => navigate("/users/signin")}
-            >
-              로그인
-            </button>
-          ) : (
-            <button
-              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium hover:bg-slate-50 cursor-pointer"
-              onClick={() => logout()}
-            >
-              로그아웃
-            </button>
-          )}
+            {!isLoggedIn ? (
+              <button
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium hover:bg-slate-50 cursor-pointer"
+                onClick={() => navigate("/users/signin")}
+              >
+                로그인
+              </button>
+            ) : (
+              <button
+                className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium hover:bg-slate-50 cursor-pointer"
+                onClick={() => logout()}
+              >
+                로그아웃
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
