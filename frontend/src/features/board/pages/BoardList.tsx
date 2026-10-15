@@ -57,23 +57,23 @@ const BoardList = () => {
 
   return (
     <div>
-      <div className="mb-8 text-sm text-slate-400">
+      <div className="mb-3 text-sm text-slate-400">
         Home <span className="mx-2">/</span>
         <span className="text-slate-600">게시판</span>
       </div>
 
-      <div className="mb-8 flex items-end justify-between">
+      <div className="mb-4 flex items-end justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">자유게시판</h1>
+          <h1 className="text-2xl font-bold tracking-tight">자유게시판</h1>
 
-          <p className="mt-2 text-slate-500">
+          <p className="mt-1 text-sm text-slate-500">
             다양한 이야기를 자유롭게 나눠보세요.
           </p>
         </div>
         {isLoggedIn && (
           <Link
             to="/boards/write"
-            className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
           >
             ✍️ 글쓰기
           </Link>
@@ -81,12 +81,12 @@ const BoardList = () => {
       </div>
 
       {/* Search */}
-      <div className="mb-6 flex gap-2">
+      <div className="mb-4 flex gap-2">
         <select
           value={criteria}
           name="criteria"
           onChange={onSearchChange}
-          className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-500"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500"
         >
           <option value={"tc"}>제목 + 내용</option>
           <option value={"t"}>제목</option>
@@ -100,7 +100,7 @@ const BoardList = () => {
             onChange={onSearchChange}
             type="text"
             placeholder="검색어를 입력하세요"
-            className="flex-1 px-4 py-3 text-sm outline-none"
+            className="flex-1 px-3 py-2 text-sm outline-none"
           />
 
           <button
@@ -113,7 +113,7 @@ const BoardList = () => {
       </div>
 
       {/* Count */}
-      <div className="mb-3 text-sm text-slate-500">
+      <div className="mb-2 text-sm text-slate-500">
         전체 <span className="font-semibold text-slate-900">{total}</span>개의
         게시글
       </div>
@@ -123,23 +123,23 @@ const BoardList = () => {
         <table className="w-full text-sm">
           <thead className="border-b border-slate-200 bg-slate-50">
             <tr>
-              <th className="w-20 px-6 py-4 text-center font-medium text-slate-500">
+              <th className="w-20 px-6 py-2.5 text-center font-medium text-slate-500">
                 번호
               </th>
 
-              <th className="px-6 py-4 text-left font-medium text-slate-500">
+              <th className="px-6 py-2.5 text-left font-medium text-slate-500">
                 제목
               </th>
 
-              <th className="w-32 px-6 py-4 text-center font-medium text-slate-500">
+              <th className="w-32 px-6 py-2.5 text-center font-medium text-slate-500">
                 작성자
               </th>
 
-              <th className="w-32 px-6 py-4 text-center font-medium text-slate-500">
+              <th className="w-32 px-6 py-2.5 text-center font-medium text-slate-500">
                 작성일
               </th>
 
-              <th className="w-24 px-6 py-4 text-center font-medium text-slate-500">
+              <th className="w-24 px-6 py-2.5 text-center font-medium text-slate-500">
                 조회
               </th>
             </tr>
@@ -148,11 +148,11 @@ const BoardList = () => {
           <tbody className="divide-y divide-slate-100">
             {data.items.map((post) => (
               <tr key={post.id} className="transition hover:bg-slate-50">
-                <td className="px-6 py-5 text-center text-slate-400">
+                <td className="px-6 py-2.5 text-center text-slate-400">
                   {post.id}
                 </td>
 
-                <td className="px-6 py-5">
+                <td className="px-6 py-2.5">
                   <Link
                     to={`/boards/${post.id}?page=${currentPage}&size=${size}`}
                     className="font-medium text-slate-800 hover:text-indigo-600"
@@ -161,15 +161,15 @@ const BoardList = () => {
                   </Link>
                 </td>
 
-                <td className="px-6 py-5 text-center text-slate-500">
+                <td className="px-6 py-2.5 text-center text-slate-500">
                   {post.user.name}
                 </td>
 
-                <td className="px-6 py-5 text-center text-slate-400">
+                <td className="px-6 py-2.5 text-center text-slate-400">
                   {post.created_at}
                 </td>
 
-                <td className="px-6 py-5 text-center text-slate-400">
+                <td className="px-6 py-2.5 text-center text-slate-400">
                   {post.views}
                 </td>
               </tr>

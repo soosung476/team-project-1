@@ -15,7 +15,7 @@ const Pagination = ({
 }: PaginationProps) => {
   if (totalPages <= 1) return null;
   return (
-    <div className="flex items-center justify-center gap-1 mt-6">
+    <div className="flex items-center justify-center gap-1 mt-4">
       {/* 이전 버튼 */}
 
       <button
@@ -23,7 +23,7 @@ const Pagination = ({
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className="
-            px-3 py-2
+            px-3 py-1.5
             rounded-md
             text-sm
             border border-gray-200
@@ -46,7 +46,7 @@ const Pagination = ({
             key={pageNumber}
             onClick={() => onPageChange(pageNumber)}
             className={`
-                w-9 h-9
+                w-8 h-8
                 rounded-md
                 text-sm
                 font-medium
@@ -69,7 +69,7 @@ const Pagination = ({
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="
-            px-3 py-2
+            px-3 py-1.5
             rounded-md
             text-sm
             border border-gray-200

@@ -37,10 +37,10 @@ const ReplyComp = ({
   };
 
   return (
-    <section className="mt-6 rounded-xl border border-slate-200 bg-white">
+    <section className="mt-4 rounded-xl border border-slate-200 bg-white">
       {/* 댓글 헤더 */}
-      <div className="border-b border-slate-200 px-8 py-5">
-        <h2 className="text-lg font-bold">
+      <div className="border-b border-slate-200 px-6 py-3">
+        <h2 className="text-base font-bold">
           댓글
           <span className="ml-1 text-indigo-600">{comments.length ?? 0}</span>
         </h2>
@@ -49,13 +49,13 @@ const ReplyComp = ({
       {/* 댓글 목록 */}
       <div>
         {comments.length === 0 ? (
-          <div className="px-8 py-12 text-center text-sm text-slate-400">
+          <div className="px-6 py-6 text-center text-sm text-slate-400">
             등록된 댓글이 없습니다.
           </div>
         ) : (
           comments.map((comment: CommentResponse) => (
             <div
-              className="border-b border-slate-100 px-8 py-6 last:border-b-0"
+              className="border-b border-slate-100 px-6 py-4 last:border-b-0"
               key={comment.comment_id}
             >
               {/* 댓글 상단 */}
@@ -100,7 +100,7 @@ const ReplyComp = ({
 
               {/* 댓글내용 */}
               {editingCommentId == comment.comment_id ? (
-                <div className="mt-4">
+                <div className="mt-3">
                   <textarea
                     onChange={(e) => setEditContent(e.target.value)}
                     value={editContent}
@@ -124,7 +124,7 @@ const ReplyComp = ({
                   </div>
                 </div>
               ) : (
-                <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-700">
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">
                   {comment.body}
                 </p>
               )}
@@ -135,17 +135,17 @@ const ReplyComp = ({
         {/* 댓글개수 존재할 때 */}
       </div>
       {/* 댓글 작성 */}
-      <div className="border-t border-slate-200 bg-slate-50 px-8 py-6">
-        <h3 className="mb-3 text-sm font-semibold text-slate-800">댓글 작성</h3>
+      <div className="border-t border-slate-200 bg-slate-50 px-6 py-4">
+        <h3 className="mb-2 text-sm font-semibold text-slate-800">댓글 작성</h3>
         <div className="flex gap-3">
           <textarea
             value={commentContent}
             placeholder="댓글을 입력해주세요."
-            className="min-h-24 flex-1 resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+            className="min-h-16 flex-1 resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
             onChange={(e) => setCommentContent(e.target.value)}
           />
           <button
-            className="self-end rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
+            className="self-end rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
             onClick={() => handleCommentSubmitWrapper()}
           >
             댓글 등록
