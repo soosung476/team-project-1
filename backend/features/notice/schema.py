@@ -8,7 +8,6 @@ class UserResponse(BaseModel):
 class NoticeCreate(BaseModel):
     title:str
     content:str
-    is_pinned: str
 
 class NoticeUpdate(BaseModel):
     title:str|None =None
