@@ -31,3 +31,36 @@ def get_room_reservations(db: Session, room_id: int, target_date: date):
         .order_by(Reservation.start_at)
     )
     return db.execute(query).mappings().all()
+
+
+def is_overlapping(a_start, a_end, b_start, b_end) -> bool:
+    return a_start < b_end and a_end > b_start
+
+def get_room_slots(db: Session, room_id: int, target_date: date):
+    reservations = get_room_reservations(db, room_id, target_date)   # API 2 함수 재사용
+    now = datetime.now()                              # 지금 시각
+
+    slot_start = datetime.combine(target_date, time(hour=8, minute=0))   # 08:00
+    day_end    = datetime.combine(target_date, time(hour=20, minute=0))   # 20:00
+
+    slots = []
+    while slot_start < day_end:
+        slot_end = slot_start + timedelta(minutes=30)
+
+        # 지난 칸이면 불가
+        is_past = slot_start < now
+
+        # 예약 겹치면 예약 불가
+        is_booked = any(
+            is_overlapping(slot_start, slot_end, r["start_at"], r["end_at"])
+            for r in reservations
+        )
+
+        slots.append({
+            "start_at": slot_start,
+            "end_at": slot_end,
+            "available": not (is_past or is_booked),
+        })
+        slot_start = slot_end          # 다음 칸으로
+
+    return slots

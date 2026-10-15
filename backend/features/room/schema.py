@@ -16,3 +16,8 @@ class ReservationResponse(BaseModel):
     end_at: datetime
     user_name: str
     user_position: str
+
+class RoomSlotResponse(BaseModel):
+    start_at: datetime
+    end_at: datetime
+    available: bool
