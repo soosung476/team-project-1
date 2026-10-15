@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException, status , Depends
 from features.user.models import User
-from features.notice.service import create_notice
+from features.notice.service import create_notice,update_notice
 from sqlalchemy.orm import Session
 from db.database import get_db
 from core.dependencies import get_current_user,get_admin_user,get_db,get_user
-from features.notice.schema import NoticeCreate
+from features.notice.schema import NoticeCreate, NoticeResponse,NoticeUpdate,NoticeListResponse,UserResponse
+from features.notice.exceptions import NotMatchedPinnedException, NoticeNotFoundException
 
 notice_router = APIRouter(prefix="/notice" , tags=["Notices"])
 
@@ -19,6 +20,26 @@ async def post_notice(
     
     return {"message":f"{new_notice.id} 번이 생성되었습니다."}  
 
-# @notice_router.get
+@notice_router.put("/{id}",response_model=dict)
+async def put_notice(
+    id:int,
+    data:NoticeUpdate,
+    db:Session = Depends(get_db),
+    current_user:User=Depends(get_admin_user)
+):
+    try:
+        id = update_notice(db=db,data=data,current_user=current_user,id=id)
+    # service 에 작성한 exception 오류 잡아주기
+    except NotMatchedPinnedException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,detail=" Y 또는 N 만 입력 가능합니다."
+        )
+    except NoticeNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,detail="공지사항을 찾을 수 없습니다."
+        )
+    return {"message":f"{id} 번이 수정되었습니다."} 
+
 # @notice_router.delete
-# @notice_router.put
+
+# @notice_router.get

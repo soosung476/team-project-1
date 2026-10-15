@@ -12,7 +12,8 @@ class NoticeCreate(BaseModel):
 class NoticeUpdate(BaseModel):
     title:str|None =None
     content:str|None =None
-    is_pinned: str|None =None
+    is_pinned: str|None = "N"
+    # 기본값 N (고정 X)
 
 class NoticeResponse(BaseModel):
     id:int
