@@ -10,8 +10,8 @@ def get_meeting_rooms(db: Session):
 
 
 def get_room_reservations(db: Session, room_id: int, target_date: date):
-    start = datetime.combine(target_date, time.min)   # 그날 00:00
-    end = start + timedelta(days=1)              # 다음날 00:00
+    start = datetime.combine(target_date, time.min)   # 그날 자정 기준
+    end = start + timedelta(days=1)              # 다음날 자정 기준
 
     query = (
         select(
@@ -22,7 +22,7 @@ def get_room_reservations(db: Session, room_id: int, target_date: date):
             User.name.label("user_name"),
             User.position.label("user_position"),
         )
-        .join(User, Reservation.id == User.id)
+        .join(User, Reservation.user_id == User.id)
         .where(
             Reservation.room_id == room_id,
             Reservation.start_at >= start,
