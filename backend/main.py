@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.lifespan import lifespan
+from features.user.router import user_router
 import db.models  # noqa: F401  (모든 모델 등록: relationship이 이름으로 다른 모델을 찾음)
 
 app = FastAPI(lifespan=lifespan, title="팀웍스 API", version="1.0.0")
@@ -16,3 +17,4 @@ app.add_middleware(
 )
 
 # 라우터 설정 - 기능을 만들 때마다 여기에 include_router 추가
+app.include_router(user_router)
