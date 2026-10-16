@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
+from sqlalchemy import select
 from features.notice.schema import NoticeCreate,NoticeUpdate,NoticeResponse,UserResponse,NoticeListResponse
 from features.user.models import User
 from features.notice.models import Notice
@@ -75,5 +76,12 @@ def get_all_notices(db:Session,page:int,size:int):
 
 
 
-def get_notice():
-    pass
+def get_one_notice(db:Session,id:int):
+    stmt = select(Notice).options(selectinload(Notice.author)).where(Notice.id == id)
+
+    notice = db.scalar(stmt)
+
+    if notice is None:
+        raise NoticeNotFoundException
+
+    return notice
