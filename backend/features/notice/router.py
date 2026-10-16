@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status , Depends
 from features.user.models import User
-from features.notice.service import create_notice,update_notice,remove_notice
+from features.notice.service import create_notice,update_notice,remove_notice,get_notice,get_all_notices
 from sqlalchemy.orm import Session
 from db.database import get_db
 from core.dependencies import get_current_user,get_admin_user,get_db,get_user
@@ -56,4 +56,10 @@ async def delete_notice(
         )
     return {"message":f"{id}번이 삭제되었습니다."}
 
-# @notice_router.get
+@notice_router.get("",response_model=NoticeListResponse)
+async def get_notices(page:int=1,size:int=10,
+    db:Session = Depends(get_db)):
+
+    result = get_all_notices(page=page,size=size,db=db)
+
+    return result
