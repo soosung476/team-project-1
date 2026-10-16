@@ -21,7 +21,7 @@ def list_room_reservations(
     db: Session = Depends(get_db),
 ):
     if db.get(MeetingRoom, room_id) is None:
-        raise HTTPException(status_code=404, detail="ROOM_NOT_FOUND")
+        raise HTTPException(status_code=404, detail={"code":"ROOM_NOT_FOUND","message":"해당 날짜에 예약된 회의실이 없습니다."})
     return get_room_reservations(db, room_id, date)
 
 
@@ -33,7 +33,9 @@ def list_room_slots(
 ):
     room = db.get(MeetingRoom, room_id)
     if room is None:
-            raise HTTPException(status_code=404, detail="ROOM_NOT_FOUND")
+            raise HTTPException(status_code=404, detail={"code":"ROOM_NOT_FOUND","message":"예약가능한 회의실이 없습니다."})
     elif room.is_active != 'Y':
-            raise HTTPException(status_code=400, detail="ROOM_INACTIVE")
+            raise HTTPException(status_code=400, detail={"code":"ROOM_INACTIVE","message":"사용할 수 없는 회의실입니다."})
+    elif date < date.today():
+            raise HTTPException(status_code=400, detail={"code":"PAST_DATE", "message":"이미 지난 날짜 입니다."})
     return get_room_slots(db,room_id,date)
