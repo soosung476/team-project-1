@@ -17,8 +17,10 @@ class User(Base):
     department_id: Mapped[int | None] = mapped_column(
         ForeignKey("departments.id"), index=True
     )
-    # 사원 · 대리 · 과장 · 부장 (관리자 페이지에서 지정)
-    position: Mapped[str] = mapped_column(String(20), default="사원", server_default="사원")
+    # 사원 팀장 사장
+    position: Mapped[str] = mapped_column(
+        String(20), default="사원", server_default="사원"
+    )
     phone: Mapped[str | None] = mapped_column(String(20))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
@@ -40,6 +42,4 @@ class User(Base):
     # user.board_posts
     board_posts: Mapped[list["BoardPost"]] = relationship(back_populates="author")
     # user.board_comments
-    board_comments: Mapped[list["BoardComment"]] = relationship(
-        back_populates="author"
-    )
+    board_comments: Mapped[list["BoardComment"]] = relationship(back_populates="author")
