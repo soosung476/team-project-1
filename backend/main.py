@@ -4,6 +4,7 @@ from core.lifespan import lifespan
 from features.user.router import user_router
 from features.notice.router import notice_router
 from features.room.router import router as room_router
+from features.board.router import board_router
 import db.models  # noqa: F401  (모든 모델 등록: relationship이 이름으로 다른 모델을 찾음)
 
 app = FastAPI(lifespan=lifespan, title="팀웍스 API", version="1.0.0")
@@ -22,3 +23,4 @@ app.add_middleware(
 app.include_router(user_router)
 app.include_router(notice_router)
 app.include_router(room_router)
+app.include_router(board_router)

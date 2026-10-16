@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from features.board.schemas import BoardResponse, BoardCreate, BoardUpdate, BoardPageResponse
-from features.board.services import create, update, select_all, select_one, delete, recentPosts
+# from features.board.services import create, update, select_all, select_one, delete, recentPosts
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
