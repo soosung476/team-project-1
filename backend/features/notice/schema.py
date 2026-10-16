@@ -21,15 +21,15 @@ class NoticeResponse(BaseModel):
     title: str
     content:str 
     is_pinned:str
-    view_count: int
+    #view_count: int
     created_at: datetime
     updated_at: datetime
-    user : UserResponse
+    author : UserResponse
 
 class NoticeListResponse(BaseModel):
-    item:list[NoticeResponse]
+    items:list[NoticeResponse]
     total:int
     page:int
     size:int
-    total_pages:int 
+    total_pages:int
 
