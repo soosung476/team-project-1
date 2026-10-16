@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status , Depends
 from features.user.models import User
-from features.notice.service import create_notice,update_notice,remove_notice,get_notice,get_all_notices
+from features.notice.service import create_notice,update_notice,remove_notice,get_one_notice,get_all_notices
 from sqlalchemy.orm import Session
 from db.database import get_db
 from core.dependencies import get_current_user,get_admin_user,get_db,get_user
@@ -63,3 +63,12 @@ async def get_notices(page:int=1,size:int=10,
     result = get_all_notices(page=page,size=size,db=db)
 
     return result
+
+@notice_router.get("/{id}",response_model=NoticeResponse)
+async def get_notice(id:int,current_user:User=Depends(get_current_user),db:Session = Depends(get_db)):
+    try:
+        id = get_one_notice(id=id,db=db)
+    except NoticeNotFoundException:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="공지사항을 찾을 수 없습니다.")
+
+    return id
