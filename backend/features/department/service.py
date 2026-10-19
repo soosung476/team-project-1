@@ -48,16 +48,3 @@ def update_Department(db: Session, department_id: int, data: DepartmentUpdate):
     db.commit()
     db.refresh(department)
     return department
-
-
-def delete_department(db: Session, department_id: int):
-
-    department = db.get(Department, department_id)
-
-    if department is None:
-        raise DepartmentNotFoundException
-    
-    db.delete(department)
-    db.commit()
-
-    
