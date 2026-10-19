@@ -1,0 +1,4 @@
+# 저장소 공통 (backend/, frontend/ 는 각 폴더의 .gitignore 참고)
+.DS_Store
+.vscode/
+.idea/

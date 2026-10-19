@@ -12,24 +12,23 @@ class NoticeCreate(BaseModel):
 class NoticeUpdate(BaseModel):
     title:str|None =None
     content:str|None =None
-    is_pinned: str|None = "N"
-    # 기본값 N (고정 X)
-
+    is_pinned: str|None = None
+    
 class NoticeResponse(BaseModel):
     id:int
     author_id: int
     title: str
     content:str 
     is_pinned:str
-    view_count: int
+    #view_count: int
     created_at: datetime
     updated_at: datetime
-    user : UserResponse
+    author : UserResponse
 
 class NoticeListResponse(BaseModel):
-    item:list[NoticeResponse]
+    items:list[NoticeResponse]
     total:int
     page:int
     size:int
-    total_pages:int 
+    total_pages:int
 
