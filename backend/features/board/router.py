@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from features.board.schemas import BoardResponse, BoardCreate, BoardUpdate, BoardPageResponse
-# from features.board.services import create, update, select_all, select_one, delete, recentPosts
+from features.board.services import create, update, select_all, select_one, delete, recentPosts
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
@@ -35,6 +35,7 @@ async def get_boards(db: Session = Depends(get_db), page: int = 1, size: int = 1
 
     return result
 
+# 하나만 조회
 @board_router.get("/{id}", response_model=BoardResponse)
 async def get_board(
     id: int,
@@ -55,7 +56,7 @@ async def put_board(
     id: int,
     update_board: BoardUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     try:
         id = update(db=db, id=id, data=update_board, current_user=current_user)
@@ -70,6 +71,7 @@ async def put_board(
         
     return {"message": f"{id} 번이 수정되었습니다."} 
 
+# 삭제
 @board_router.delete("/{id}", response_model=dict)
 async def delete_board(
     id: int,

@@ -21,3 +21,20 @@ class RoomSlotResponse(BaseModel):
     start_at: datetime
     end_at: datetime
     available: bool
+
+class ReservationCreate(BaseModel):
+    room_id: int
+    title: str
+    start_at: datetime
+    end_at: datetime
+
+class ReservationDetailResponse(BaseModel):
+    id: int
+    room_id: int
+    room_name: str
+    title: str
+    start_at: datetime
+    end_at: datetime
+    user_name: str
+    user_position: str
+    created_at: datetime
