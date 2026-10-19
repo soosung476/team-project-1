@@ -4,9 +4,10 @@ from sqlalchemy.orm import Session
 
 from db.database import get_db
 from features.room.models import MeetingRoom
-from features.room.schema import MeetingRoomResponse, ReservationResponse, RoomSlotResponse
-from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots
-
+from features.room.schema import MeetingRoomResponse, ReservationResponse, RoomSlotResponse, ReservationCreate, ReservationDetailResponse
+from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation
+from core.dependencies import get_current_user
+from features.user.models import User
 
 router = APIRouter(prefix="/rooms", tags=["rooms"])
 
@@ -39,3 +40,14 @@ def list_room_slots(
     elif date < date.today():
             raise HTTPException(status_code=400, detail={"code":"PAST_DATE", "message":"이미 지난 날짜 입니다."})
     return get_room_slots(db,room_id,date)
+
+# 기존 고정 경로하고 달라서 reservations로 하나 더 만듬 
+reserv_router = APIRouter(prefix="/reservations", tags=["reservations"])
+
+@reserv_router.post("",response_model=ReservationDetailResponse,status_code=201)
+def list_create_reservation(
+      data:ReservationCreate,
+      db: Session = Depends(get_db),
+      user: User= Depends(get_current_user),
+):
+    return create_room_reservation(db, user, data)
