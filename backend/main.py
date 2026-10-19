@@ -6,6 +6,7 @@ from features.notice.router import notice_router
 from features.room.router import router as room_router
 from features.room.router import reserv_router as room_reserv_router
 from features.board.router import board_router
+from features.approval.router import approval_router
 import db.models  # noqa: F401  (모든 모델 등록: relationship이 이름으로 다른 모델을 찾음)
 
 app = FastAPI(lifespan=lifespan, title="팀웍스 API", version="1.0.0")
@@ -26,3 +27,4 @@ app.include_router(notice_router)
 app.include_router(room_router)
 app.include_router(board_router)
 app.include_router(room_reserv_router)
+app.include_router(approval_router)

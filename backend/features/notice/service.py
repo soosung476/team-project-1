@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
+from sqlalchemy import select
 from features.notice.schema import NoticeCreate,NoticeUpdate,NoticeResponse,UserResponse,NoticeListResponse
 from features.user.models import User
 from features.notice.models import Notice
@@ -50,6 +51,9 @@ def remove_notice(db:Session,id:int):
 def get_all_notices(db:Session,page:int,size:int):
     notice = db.query(Notice)
 
+    if notice is None:
+        raise NoticeNotFoundException
+
     offset = (page - 1) * size
     # 고정글
     pinned_notices = notice.filter(Notice.is_pinned == "Y").order_by(Notice.id.desc()).all()
@@ -75,5 +79,12 @@ def get_all_notices(db:Session,page:int,size:int):
 
 
 
-def get_notice():
-    pass
+def get_one_notice(db:Session,id:int):
+    stmt = select(Notice).options(selectinload(Notice.author)).where(Notice.id == id)
+
+    notice = db.scalar(stmt)
+
+    if notice is None:
+        raise NoticeNotFoundException
+
+    return notice
