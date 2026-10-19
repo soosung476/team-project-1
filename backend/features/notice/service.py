@@ -51,6 +51,9 @@ def remove_notice(db:Session,id:int):
 def get_all_notices(db:Session,page:int,size:int):
     notice = db.query(Notice)
 
+    if notice is None:
+        raise NoticeNotFoundException
+
     offset = (page - 1) * size
     # 고정글
     pinned_notices = notice.filter(Notice.is_pinned == "Y").order_by(Notice.id.desc()).all()
