@@ -4,13 +4,24 @@ from db.database import get_db
 from features.department.schema import DepartmentResponse,DepartmentCreate,DepartmentUpdate
 from features.department import service
 from features.department.exceptions import DepartmentExistingException,DepartmentNotFoundException
+from core.dependencies import get_current_user
 
-router = APIRouter(prefix="/department", tags=["departments"])
+router = APIRouter(prefix="/department", tags=["departments"], dependencies=[Depends(get_current_user)])
 
 
 @router.get("", response_model=list[DepartmentResponse])
 def get_departments(db:Session = Depends(get_db)):
     return service.get_departments(db)
+
+@router.get("/{department_id}", response_model=DepartmentResponse)
+def get_department(department_id: int, db:Session = Depends(get_db)):
+    try:
+        return service.get_department(db, department_id)
+    except DepartmentNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="해당 부서를 찾을 수 없습니다."
+        )
 
 @router.post("", response_model=DepartmentResponse)
 def create_department(data: DepartmentCreate, db: Session = Depends(get_db)):
@@ -37,6 +48,17 @@ def update_department(department_id: int, data: DepartmentUpdate, db: Session = 
             status_code=status.HTTP_409_CONFLICT,
             detail="이미 존재하는 부서 이름입니다."
         )
+
 # @router.delete("/{department_id}")
 # def delete_Department(department_id: int, db: Session = Depends(get_db)):
 #     service.delete_Department(db, department_id)
+@router.delete("/{department_id}")
+def delete_Department(department_id:int, db:Session=Depends(get_db)):
+    try:
+        return service.delete_department(db, department_id)
+    except DepartmentNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="해당 부서를 찾을 수 없습니다."
+        )
+    
