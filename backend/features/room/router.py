@@ -9,7 +9,7 @@ from features.room.service import get_meeting_rooms, get_room_reservations, get_
 from core.dependencies import get_current_user
 from features.user.models import User
 
-router = APIRouter(prefix="/rooms", tags=["rooms"])
+router = APIRouter(prefix="/rooms", tags=["rooms"], dependencies=[Depends(get_current_user)])
 
 @router.get("", response_model=list[MeetingRoomResponse])
 def list_rooms(db: Session = Depends(get_db)):
