@@ -8,8 +8,12 @@ import BoardList from "./features/board/pages/BoardList";
 import BoardWrite from "./features/board/pages/BoardWrite";
 import LoginPage from "./features/user/pages/LoginPage";
 import SignupPage from "./features/user/pages/SignupPage";
+<<<<<<< HEAD
+import RoomReservation from "./features/room/pages/RoomReservation";
+=======
 import AdminUserPage from "./features/admin/pages/AdminUserPage";
 
+>>>>>>> develop
 function App() {
   return (
     <>
@@ -19,7 +23,7 @@ function App() {
 
           <Route path="/notices"></Route>
           <Route path="/approvals"></Route>
-          <Route path="/rooms"></Route>
+          <Route path="/rooms" element={<RoomReservation />} />
           <Route path="/boards">
             <Route index element={<BoardList />} />
             <Route path="write" element={<BoardWrite />} />
