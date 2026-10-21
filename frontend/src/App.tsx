@@ -8,12 +8,9 @@ import BoardList from "./features/board/pages/BoardList";
 import BoardWrite from "./features/board/pages/BoardWrite";
 import LoginPage from "./features/user/pages/LoginPage";
 import SignupPage from "./features/user/pages/SignupPage";
-<<<<<<< HEAD
 import RoomReservation from "./features/room/pages/RoomReservation";
-=======
 import AdminUserPage from "./features/admin/pages/AdminUserPage";
 
->>>>>>> develop
 function App() {
   return (
     <>
