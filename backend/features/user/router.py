@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from core.dependencies import get_current_user
 from features.user.models import User
-from features.user.schema import UserLogin, Token, UserCreate
+from features.user.schema import UserLogin, Token, UserCreate, UserResponse
 from features.user.service import authenticate, user_register
 from features.user.exceptions import (
     UserNotFoundException,
@@ -15,7 +15,7 @@ from features.user.exceptions import (
 user_router = APIRouter(prefix="/auth", tags=["Users"])
 
 
-@user_router.get("/me")
+@user_router.get("/me", response_model=UserResponse)
 async def read_me(current_user: User = Depends(get_current_user)):
     return current_user
 
@@ -29,7 +29,7 @@ async def post_signup(data: UserCreate, db: Session = Depends(get_db)) -> dict:
             status_code=status.HTTP_409_CONFLICT, detail="이미 등록된 이메일입니다."
         )
 
-    return {"message": f"회원가입이 완료되었습니다.", "user_id": user.id}
+    return {"message": "회원가입이 완료되었습니다.", "user_id": user.id}
 
 
 @user_router.post("/login", response_model=Token)

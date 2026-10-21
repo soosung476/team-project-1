@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from features.user.models import User
 from core.jwt_token import decode_access_token
-from features.user.exceptions import UserCredentialsException
+from features.user.exceptions import UserCredentialsException, UserNotFoundException
 from features.user.service import get_user
 
 bearer_scheme = HTTPBearer()
@@ -26,7 +26,11 @@ def get_current_user(
     except UserCredentialsException:
         raise credentials_error
 
-    return get_user(db=db, user_id=user_id)
+    try:
+        user = get_user(db=db, user_id=user_id)
+    except UserNotFoundException:
+        raise credentials_error
+    return user
 
 
 def get_admin_user(current_user: User = Depends(get_current_user)) -> User:

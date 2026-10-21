@@ -3,13 +3,18 @@ from sqlalchemy.orm import Session
 from features.department.models import Department
 from features.department.schema import DepartmentCreate, DepartmentResponse, DepartmentUpdate
 from features.department.exceptions import DepartmentExistingException, DepartmentNotFoundException
-
+from sqlalchemy import select, func
 
 def get_departments(db: Session):
 
     query = select(Department).order_by(Department.id)
     return db.scalars(query).all()
 
+def get_department(db: Session, department_id : int):
+    department = db.get(Department, department_id)
+    if department is None:
+        raise DepartmentNotFoundException
+    return department
 
 def create_department(db: Session, data: DepartmentCreate):
 
@@ -19,8 +24,9 @@ def create_department(db: Session, data: DepartmentCreate):
 
     if existing is not None:
         raise DepartmentExistingException
+    max_id = db.scalar(select(func.max(Department.id))) or 0
     
-    department = Department(name=data.name)
+    department = Department(id=max_id + 1, name=data.name)
 
     db.add(department)
     db.commit()
@@ -48,3 +54,10 @@ def update_Department(db: Session, department_id: int, data: DepartmentUpdate):
     db.commit()
     db.refresh(department)
     return department
+
+def delete_department(db: Session, department_id: int):
+    department = db.get(Department, department_id)
+    if department is None:
+        raise DepartmentNotFoundException
+    db.delete(department)
+    db.commit()
