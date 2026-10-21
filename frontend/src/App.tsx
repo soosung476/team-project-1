@@ -8,6 +8,7 @@ import BoardList from "./features/board/pages/BoardList";
 import BoardWrite from "./features/board/pages/BoardWrite";
 import LoginPage from "./features/user/pages/LoginPage";
 import SignupPage from "./features/user/pages/SignupPage";
+import AdminUserPage from "./features/admin/pages/AdminUserPage";
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
             <Route path="signin" element={<LoginPage />} />
             <Route path="signup" element={<SignupPage />} />
           </Route>
-          <Route path="/admin/users"></Route>
+          <Route path="/admin/users" element={<AdminUserPage />} />
         </Route>
       </Routes>
     </>
