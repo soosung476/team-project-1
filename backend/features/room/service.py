@@ -161,3 +161,32 @@ def get_reservations(db: Session, user_id: int, scope:str):
         query = query.where(Reservation.user_id == user_id)
 
     return db.execute(query).mappings().all()
+
+# 권한 검사
+def can_manage_reservation(user: User, reservation: Reservation) -> bool:
+    # 지금 규칙: 예약자 본인
+    is_owner = user.id == reservation.user_id
+    # 나중에 규칙 추가: ADMIN이면 전부 가능
+    # is_admin = user.role == "ADMIN"
+    # return is_owner or is_admin
+    return is_owner
+
+
+def cancel_reservation(db: Session, user: User, reservation_id: int):
+    # 예약 꺼내기
+    reservation = db.get(Reservation, reservation_id)
+
+    # 예약 없으면 오류 404
+    if reservation is None:
+        raise HTTPException(status_code=404, detail={"code": "RESERVATION_NOT_FOUND", "message": "예약을 찾을 수 없습니다."})
+
+    # 권한 없으면 오류 403
+    if not can_manage_reservation(user, reservation):
+        raise HTTPException(status_code=403, detail={"code": "FORBIDDEN", "message": "본인 예약만 취소할 수 있습니다."})
+
+    # 삭제
+    deleted_id = reservation.id
+    db.delete(reservation)
+    db.commit()
+
+    return {"id": deleted_id, "message": "예약이 취소되었습니다."}

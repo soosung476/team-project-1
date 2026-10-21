@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from features.room.models import MeetingRoom
 from features.room.schema import MeetingRoomResponse, ReservationResponse, RoomSlotResponse, ReservationCreate, ReservationDetailResponse
-from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation, get_reservations
+from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation, get_reservations, cancel_reservation
 from core.dependencies import get_current_user
 from features.user.models import User
 from typing import Literal
@@ -61,3 +61,12 @@ def list_reservations(
     db: Session= Depends(get_db),
 ):
     return get_reservations(db, user.id, scope )
+
+
+@reserv_router.delete("/{reservation_id}")
+def delete_reservation(
+    reservation_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    return cancel_reservation(db, user, reservation_id)
