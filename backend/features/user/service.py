@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from core.security import verify_password
+from core.security import verify_password, hash_password
 from core.jwt_token import create_access_token
 from features.user.models import User
 from features.user.exceptions import (
@@ -9,9 +9,6 @@ from features.user.exceptions import (
     UserExistingException,
 )
 from features.user.schema import UserLogin, Token, UserCreate
-
-# from core.dependencies import get_current_user
-from core.security import hash_password
 
 DUMMY_HASH = hash_password("dummypassword")
 
