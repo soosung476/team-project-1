@@ -4,8 +4,7 @@ from sqlalchemy.orm import Session
 from features.room.models import MeetingRoom, Reservation
 from features.room.schema import ReservationCreate
 from features.user.models import User
-from fastapi import HTTPException, Depends 
-from db.database import get_db
+from fastapi import HTTPException
 
 def get_meeting_rooms(db: Session):
     query = select(MeetingRoom).where(MeetingRoom.is_active == 'Y').order_by(MeetingRoom.id)
@@ -139,3 +138,26 @@ def create_room_reservation(db: Session, user: User, data: ReservationCreate):
         "user_position": user.position,
         "created_at": reservation.created_at,
     }
+
+# 내 or 전체 예약 조회-> scope 변수로 구분:mine/all  
+def get_reservations(db: Session, user_id: int, scope:str):
+    query = (
+        select(
+            Reservation.id,
+            Reservation.room_id,
+            MeetingRoom.name.label("room_name"),
+            Reservation.title,
+            Reservation.start_at,
+            Reservation.end_at,
+            User.name.label("user_name"),
+            User.position.label("user_position"),
+            Reservation.created_at,
+        )
+        .join(MeetingRoom, MeetingRoom.id == Reservation.room_id)
+        .join(User, Reservation.user_id == User.id)
+        .order_by(Reservation.start_at)
+    )
+    if scope == "mine":
+        query = query.where(Reservation.user_id == user_id)
+
+    return db.execute(query).mappings().all()
