@@ -1,42 +1,41 @@
+import axiosInstance from "../../../common/apis/axios";
 import type {MeetingRoomResponse, ReservationResponse, RoomSlotResponse,
     ReservationCreate,ReservationDetailResponse} from "../types/room";
-import axios from "axios";
 
 
+// 회의실 목록
 export const getRooms = async (): Promise<MeetingRoomResponse[]> => {
-  const response = await axios.get("/rooms");
+  const response = await axiosInstance.get("/rooms");
   return response.data;
 };
     
-
-export const getReservations = async (
-    
+// 회의실 예약 현황
+export const getRoomReservations = async (
     roomId: number,
     date: string,
 ): Promise<ReservationResponse[]> => {
-    const response = await axios.get(`/rooms/${roomId}/reservations`, {
-        params:{date},
-        
+    const response = await axiosInstance.get(`/rooms/${roomId}/reservations`, {
+        params:{ date },
     });
     return response.data;
-}
+};
 
 
-// API 3. 시간대 조회 (30분 칸 24개)
+//시간대 조회 (30분 칸 24개)
 export const getRoomSlots = async (
   roomId: number,
   date: string,
 ): Promise<RoomSlotResponse[]> => {
-  const response = await axios.get(`/rooms/${roomId}/slots`, {
+  const response = await axiosInstance.get(`/rooms/${roomId}/slots`, {
     params: { date },
   });
   return response.data;
 };
 
-// API 4. 예약 등록
+// 예약 등록
 export const postReservation = async (
   body: ReservationCreate,
 ): Promise<ReservationDetailResponse> => {
-  const response = await axios.post("/reservations", body);
+  const response = await axiosInstance.post("/reservations", body);
   return response.data;
 };
