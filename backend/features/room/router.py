@@ -5,9 +5,10 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from features.room.models import MeetingRoom
 from features.room.schema import MeetingRoomResponse, ReservationResponse, RoomSlotResponse, ReservationCreate, ReservationDetailResponse
-from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation
+from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation, get_reservations
 from core.dependencies import get_current_user
 from features.user.models import User
+from typing import Literal
 
 router = APIRouter(prefix="/rooms", tags=["rooms"], dependencies=[Depends(get_current_user)])
 
@@ -34,11 +35,11 @@ def list_room_slots(
 ):
     room = db.get(MeetingRoom, room_id)
     if room is None:
-            raise HTTPException(status_code=404, detail={"code":"ROOM_NOT_FOUND","message":"예약가능한 회의실이 없습니다."})
+        raise HTTPException(status_code=404, detail={"code":"ROOM_NOT_FOUND","message":"예약가능한 회의실이 없습니다."})
     elif room.is_active != 'Y':
-            raise HTTPException(status_code=400, detail={"code":"ROOM_INACTIVE","message":"사용할 수 없는 회의실입니다."})
+        raise HTTPException(status_code=400, detail={"code":"ROOM_INACTIVE","message":"사용할 수 없는 회의실입니다."})
     elif date < date.today():
-            raise HTTPException(status_code=400, detail={"code":"PAST_DATE", "message":"이미 지난 날짜 입니다."})
+        raise HTTPException(status_code=400, detail={"code":"PAST_DATE", "message":"이미 지난 날짜 입니다."})
     return get_room_slots(db,room_id,date)
 
 # 기존 고정 경로하고 달라서 reservations로 하나 더 만듬 
@@ -51,3 +52,12 @@ def list_create_reservation(
       user: User= Depends(get_current_user),
 ):
     return create_room_reservation(db, user, data)
+
+
+@reserv_router.get("",response_model=list[ReservationDetailResponse])
+def list_reservations(
+    scope: Literal["mine", "all"] = "mine",
+    user: User = Depends(get_current_user), 
+    db: Session= Depends(get_db),
+):
+    return get_reservations(db, user.id, scope )
