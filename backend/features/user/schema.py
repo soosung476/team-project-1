@@ -22,15 +22,28 @@ Password = Annotated[
     str, Field(min_length=8, max_length=64), AfterValidator(validate_password_strength)
 ]
 
+
 class UserLogin(BaseModel):
     email: str
     password: str
+
 
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
+
 class UserCreate(BaseModel):
-    name:str
-    password:Password
-    email:EmailStr
+    name: str
+    password: Password
+    email: EmailStr
+
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    name: str
+    role: str
+    department_id: int | None
+    position: str | None
+    phone: str | None
