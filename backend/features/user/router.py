@@ -29,7 +29,7 @@ async def post_signup(data: UserCreate, db: Session = Depends(get_db)) -> dict:
             status_code=status.HTTP_409_CONFLICT, detail="이미 등록된 이메일입니다."
         )
 
-    return {"message": f"회원가입이 완료되었습니다.", "user_id": user.id}
+    return {"message": "회원가입이 완료되었습니다.", "user_id": user.id}
 
 
 @user_router.post("/login", response_model=Token)

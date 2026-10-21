@@ -1,5 +1,4 @@
-from fastapi.security import HTTPBearer
-from pydantic import BaseModel, EmailStr, Field, ConfigDict, AfterValidator
+from pydantic import BaseModel, EmailStr, Field, AfterValidator
 from typing import Annotated
 import re
 
@@ -14,7 +13,7 @@ def validate_password_strength(v: str) -> str:
     if not re.search(r"\d", v):
         raise ValueError("숫자를 1자 이상 포함해야 합니다.")
     if not any(c in SPECIAL_CHARS for c in v):
-        raise ValueError(f"특수문자{SPECIAL_CHARS}를 1개 이상 이상 포함해야 합니다")
+        raise ValueError(f"특수문자{SPECIAL_CHARS}를 1개 이상 포함해야 합니다")
     return v
 
 
@@ -24,7 +23,7 @@ Password = Annotated[
 
 
 class UserLogin(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 
@@ -34,7 +33,7 @@ class Token(BaseModel):
 
 
 class UserCreate(BaseModel):
-    name: str
+    name: str = Field(min_length=1, max_length=50)
     password: Password
     email: EmailStr
 
