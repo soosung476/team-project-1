@@ -30,7 +30,7 @@ export const getApproval = async (id: number) => {
 };
 
 export const deleteApproval = async (id: number) => {
-  const response = await axiosInstance.get(`${SERVER_URL}/${id}`);
+  const response = await axiosInstance.delete(`${SERVER_URL}/${id}`);
   return response.data;
 };
 
