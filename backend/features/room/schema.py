@@ -12,6 +12,7 @@ class MeetingRoomResponse(BaseModel):
 
 class ReservationResponse(BaseModel):
     id: int
+    user_id:int
     title: str
     start_at: datetime
     end_at: datetime
