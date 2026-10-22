@@ -10,6 +10,7 @@ import LoginPage from "./features/user/pages/LoginPage";
 import SignupPage from "./features/user/pages/SignupPage";
 import RoomReservation from "./features/room/pages/RoomReservation";
 import AdminUserPage from "./features/admin/pages/AdminUserPage";
+import NoticeList from "./features/notice/pages/NoticeList";
 
 function App() {
   return (
@@ -18,7 +19,7 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Home />} />
 
-          <Route path="/notices"></Route>
+          <Route path="/notices" element={<NoticeList />}></Route>
           <Route path="/approvals"></Route>
           <Route path="/rooms" element={<RoomReservation />} />
           <Route path="/boards">
