@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+/* 드롭다운(select) 공통 화살표
+   - 브라우저 기본 화살표는 오른쪽 끝에 붙어서 여백(px-2 등)으로 옮길 수 없음
+     → appearance: none 으로 끄고, 아래쪽 꺾쇠 그림을 배경으로 직접 그림
+   - 이 규칙은 @layer 밖에 있어서 Tailwind 클래스보다 우선함
+     → 각 화면의 px-2·px-3 이 있어도 오른쪽 여백은 화살표 자리(1.75rem)로 고정 */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2394a3b8' stroke-width='1.5'%3E%3Cpath d='M6 8l4 4 4-4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.375rem center;
+  background-size: 1rem;
+  padding-right: 1.75rem;
+}
