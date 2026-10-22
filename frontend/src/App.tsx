@@ -11,6 +11,8 @@ import SignupPage from "./features/user/pages/SignupPage";
 import RoomReservation from "./features/room/pages/RoomReservation";
 import AdminUserPage from "./features/admin/pages/AdminUserPage";
 import NoticeList from "./features/notice/pages/NoticeList";
+import ApprovalList from "./features/approval/pages/ApprovalList";
+import ApprovalInbox from "./features/approval/pages/ApprovalInbox";
 
 function App() {
   return (
@@ -20,7 +22,10 @@ function App() {
           <Route path="/" element={<Home />} />
 
           <Route path="/notices" element={<NoticeList />}></Route>
-          <Route path="/approvals"></Route>
+          <Route path="/approvals">
+            <Route index element={<ApprovalList />} />
+            <Route path="inbox" element={<ApprovalInbox />} />
+          </Route>
           <Route path="/rooms" element={<RoomReservation />} />
           <Route path="/boards">
             <Route index element={<BoardList />} />

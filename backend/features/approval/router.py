@@ -48,9 +48,6 @@ approval_router = APIRouter(prefix="/approvals", tags=["approval"])
 # PUT    /approvals/{id}       -> 승인·반려 (결재자만)
 # DELETE /approvals/{id}       -> 삭제 (기안자만, 처리 전 문서만)
 
-# 주의: /pending 같은 고정 경로는 /{id}보다 위에 둬야 합니다.
-# 아래에 두면 "pending"을 id로 읽으려다 422 오류가 납니다.
-
 
 @approval_router.get("/pending", response_model=list[ApprovalListItem])
 async def get_pending(
