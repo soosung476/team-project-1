@@ -5,7 +5,7 @@
 // 화면에 보여줄 페이지 개수 제한
 // page, size 가져오려면 hooks 먼저 만들기
 
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import useNotices from "../hooks/useNotices";
 import { useAuth } from "../../user/context/AuthContext";
 
@@ -18,12 +18,11 @@ const NoticeList = () => {
   const { total, total_pages } = data;
 
   const { isLoggedIn } = useAuth();
-
   return (
     <div>
       <div className="mb-8 text-sm text-slate-400">
         Home <span className="mx-2">/</span>
-        <span className="text-slate-600">게시판</span>
+        <span className="text-slate-600">공지사항</span>
       </div>
 
       <div className="mb-8 flex items-end justify-between">
@@ -35,10 +34,10 @@ const NoticeList = () => {
 
         {isLoggedIn && (
           <Link
-            to="/boards/write"
+            to="/notices/write"
             className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
           >
-            ✍️ 글쓰기
+            글쓰기
           </Link>
         )}
       </div>
@@ -63,14 +62,18 @@ const NoticeList = () => {
 
           <tbody className="divide-y divide-slate-100">
             {data.items.map((post) => (
-              <tr key={post.id} className="transition hover:bg-slate-50">
+              <tr
+                key={post.id}
+                className={post.is_pinned === "Y" ? `transition bg-slate-200` : `transition hover:bg-slate-50`}
+              >
                 <td className="px-6 py-5 text-center text-slate-400">{post.id}</td>
+
                 <td className="px-6 py-5">
                   <Link
-                    to={`/boards/${post.id}?page=${Page}&size=${Size}`}
+                    to={`/notices/${post.id}?page=${Page}&size=${Size}`}
                     className="font-medium text-slate-800 hover:text-indigo-600"
                   >
-                    {post.title}
+                    {post.is_pinned === "Y" ? `[고정] ${post.title}` : `${post.title}`}
                   </Link>
                 </td>
 
