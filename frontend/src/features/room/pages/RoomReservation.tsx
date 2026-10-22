@@ -3,64 +3,122 @@ import type {
   ReservationResponse,
   RoomSlotResponse,
 } from "../types/room";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { getRoomReservations, getRooms, getRoomSlots, postReservation } from "../apis/roomApi";
+import {useAuth} from "../../user/context/AuthContext";
 
-// ─────────────────────────────────────────────
-// 디자인 확인용 가짜 데이터 (다음 태스크에서 API 데이터로 교체)
-// ─────────────────────────────────────────────
-const fakeDate = "2026-11-20";
+const getToday = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+};
 
-// GET /rooms 응답 모양
-const fakeRooms: MeetingRoomResponse[] = [
-  { id: 1, name: "대회의실", capacity: 12, location: "5층 동쪽" },
-  { id: 2, name: "소회의실 1", capacity: 4, location: "5층 서쪽" },
-  { id: 3, name: "소회의실 2", capacity: 4, location: "5층 서쪽" },
-  { id: 4, name: "포커스룸", capacity: 2, location: "4층 라운지 옆" },
-];
-
-// GET /rooms/{id}/reservations?date= 응답 모양
-const fakeReservations: ReservationResponse[] = [
-  {
-    id: 11,
-    title: "주간 회의",
-    start_at: `${fakeDate}T11:00:00`,
-    end_at: `${fakeDate}T11:30:00`,
-    user_name: "김민재",
-    user_position: "사원",
-  },
-  {
-    id: 12,
-    title: "분기 보고",
-    start_at: `${fakeDate}T14:00:00`,
-    end_at: `${fakeDate}T15:30:00`,
-    user_name: "이사원",
-    user_position: "사원",
-  },
-];
-
-// GET /rooms/{id}/slots?date= 응답 모양 (08:00 ~ 20:00, 30분 × 24칸)
+// 숫자를 두 자리로: 9 → 09
 const pad = (n: number) => String(n).padStart(2, "0");
-const fakeSlots: RoomSlotResponse[] = Array.from({ length: 24 }, (_, i) => {
-  const startMin = 8 * 60 + i * 30;
-  const endMin = startMin + 30;
-  const toIso = (m: number) =>
-    `${fakeDate}T${pad(Math.floor(m / 60))}:${pad(m % 60)}:00`;
-  return { start_at: toIso(startMin), end_at: toIso(endMin), available: true };
-});
-
-// 화면 확인용: 사용자가 09:00, 09:30 칸을 골랐다고 가정
-const fakeSelected = [`${fakeDate}T09:00:00`, `${fakeDate}T09:30:00`];
 
 // "2026-11-20T09:30:00" → "09:30"
 const toHHMM = (iso: string) => iso.slice(11, 16);
 
-// 칸과 겹치는 예약 찾기 (백엔드 is_overlapping 과 같은 규칙)
-const findReservation = (slot: RoomSlotResponse) =>
-  fakeReservations.find(
-    (r) => slot.start_at < r.end_at && slot.end_at > r.start_at,
-  );
-
 const RoomReservation = () => {
-  const selectedRoom = fakeRooms[2];
+  const { user } = useAuth();
+  const [rooms, setRooms] = useState<MeetingRoomResponse[]>([]);
+  const [reservations, setReservations] = useState<ReservationResponse[]>([]);   
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(getToday());
+  const [slots, setSlots] = useState<RoomSlotResponse[]>([]);
+  const [selectedSlots,setSelectedSlots] = useState<string[]>([]);
+  const [title,setTitle] = useState<string>("");
+  const [submitting, setSubmitting] = useState<boolean>(false); 
+  const [message, setMessage] = useState<string>("");
+
+  // 칸과 겹치는 예약 찾기 (백엔드의 is_overlapping 과 비슷한거임)
+  const findReservation = (slot: RoomSlotResponse) =>
+    reservations.find(
+      (r) => slot.start_at < r.end_at && slot.end_at > r.start_at,
+    );
+  
+  // 회의실 목록 불러오기, 첫 번째 회의실이 디폴트
+  useEffect(() => {
+    getRooms().then((data) => {
+      setRooms(data);
+      if (data.length > 0) setSelectedRoomId(data[0].id);
+    });
+  }, []);
+
+  // 회의실·날짜가 바뀔 때마다: 예약 목록 다시 불러옴
+  useEffect(() => {
+    if(selectedRoomId == null) return;
+
+    getRoomReservations(selectedRoomId, selectedDate).then((data) =>{
+      setReservations(data);
+    });
+  }, [selectedRoomId,selectedDate]);
+
+  // 회의실·날짜가 바뀔 때마다: 30분 단위 시간 칸(예약 가능 여부) 다시 불러오기 (회의실 선택 전이면 건너뜀)
+  useEffect(() => {
+    if(selectedRoomId == null) return;
+    getRoomSlots(selectedRoomId,selectedDate).then((data) =>{
+      setSlots(data);
+    });
+  },[selectedRoomId, selectedDate]);
+
+  const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
+  const startAt = selectedSlots[0];                         
+  const lastSlot = slots.find((s) => s.start_at === selectedSlots[selectedSlots.length-1] );     // 빈칸: selectedSlots의 마지막 값
+  const endAt = lastSlot?.end_at;
+
+  // 예약 버튼을 누를 수 있는 상태인지
+  const canSubmit =
+    selectedRoomId != null && !!startAt && !!endAt && title.trim() !== "" && !submitting;
+
+  // 예약 등록 후 / 409 충돌 후: 지금 회의실·날짜 데이터 다시호출
+  const refresh = (roomId: number) => {
+    getRoomReservations(roomId, selectedDate).then(setReservations);
+    getRoomSlots(roomId, selectedDate).then(setSlots);
+  };
+
+  // 예약 등록 
+  const handleSubmit = async () => {
+    if (selectedRoomId == null || !startAt || !endAt) return;
+    if (title.trim() === "") return;
+
+    setSubmitting(true);
+    setMessage("");
+    try {
+      await postReservation({
+        room_id: selectedRoomId,
+        title: title.trim(),
+        start_at: startAt,
+        end_at: endAt,
+      });
+      setMessage("예약이 완료되었습니다.");
+      setSelectedSlots([]);
+      setTitle("");
+      refresh(selectedRoomId);
+    } catch (err) {
+      // 백엔드 detail = { code, message } 모양이면 그 message 를 보여줌
+      if (axios.isAxiosError(err)) {
+        const detail = err.response?.data?.detail;
+        const status = err.response?.status;
+        if (detail && typeof detail === "object" && "message" in detail) {
+          setMessage(detail.message);
+        } else if (status === 422) {
+          setMessage("입력값을 확인해 주세요.");
+        } else {
+          setMessage("예약 중 오류가 발생했습니다.");
+        }
+        // 409: 그사이 다른 사람이 먼저 예약함 → 선택 비우고 최신 상태로
+        if (status === 409) {
+          setSelectedSlots([]);
+          refresh(selectedRoomId);
+        }
+      } else {
+        setMessage("예약 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // 카드 박스 공통 스타일 (팀 디자인 확정 시 여기만 바꾸면 됨)
   const card = "overflow-hidden rounded-xl border border-slate-200 bg-white";
@@ -93,26 +151,38 @@ const RoomReservation = () => {
           <div className={cardHeader}>
             <span className="font-semibold">일별 예약현황</span>
             <span className="text-xs text-slate-500">
-              {selectedRoom.name} · 예약 {fakeReservations.length}건
+              {selectedRoom?.name} · 예약 {reservations.length}건
             </span>
           </div>
-
-          {/* 날짜 선택 + 회의실 선택 (현황 영역에서 바로 고름) */}
+           {/* 날짜 선택 + 회의실 선택 (예약현황 영역에서 바로 고름) */}
           <div className="flex shrink-0 items-center gap-3 border-b border-slate-200 px-5 py-3">
             <input
               type="date"
-              defaultValue={fakeDate}
+              value={selectedDate}
+              min={getToday()}
+              
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                setSelectedSlots([]);
+                setMessage("");
+              }}
+              
               className="shrink-0 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-500"
             />
 
             {/* 회의실 선택 칩: 회의실이 많아지면 이 줄만 가로 스크롤 */}
             <div className="flex min-w-0 gap-2 overflow-x-auto">
-              {fakeRooms.map((room) => {
-                const isActive = room.id === selectedRoom.id;
+              {rooms.map((room) => {
+                const isActive = room.id === selectedRoomId;
                 return (
                   <button
                     key={room.id}
                     type="button"
+                    onClick={() => {
+                      setSelectedRoomId(room.id);
+                      setSelectedSlots([]);
+                      setMessage("");
+                    }}
                     className={`shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition ${
                       isActive
                         ? "border-indigo-500 bg-indigo-50 text-indigo-700"
@@ -126,11 +196,11 @@ const RoomReservation = () => {
             </div>
           </div>
 
-          {/* 시간 목록: 이 페이지에서 유일하게 내부 스크롤이 있는 곳 */}
+          {/* 시간 목록 */}
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {fakeSlots.map((slot) => {
+            {slots.map((slot) => {
               const reservation = findReservation(slot);
-              const isSelected = fakeSelected.includes(slot.start_at);
+              const isSelected = selectedSlots.includes(slot.start_at);
               const isFirstOfReservation =
                 reservation && reservation.start_at === slot.start_at;
 
@@ -146,6 +216,20 @@ const RoomReservation = () => {
               return (
                 <div
                   key={slot.start_at}
+                  onClick={() => {
+                      if(reservation || !slot.available) return;
+
+                      if (isSelected) {                     
+                        setSelectedSlots([]);
+                      } else if (slot.start_at === endAt) {    
+                        setSelectedSlots([...selectedSlots, slot.start_at]);
+                      } else if (slot.end_at === startAt) {      
+                        setSelectedSlots([slot.start_at, ...selectedSlots]);
+                      } else {                              
+                        setSelectedSlots([slot.start_at]);
+                      }
+                    }
+                  }
                   className={`flex h-10 items-center gap-3 border-b border-slate-100 px-4 text-sm ${rowStyle}`}
                 >
                   <input
@@ -191,12 +275,14 @@ const RoomReservation = () => {
               {/* 선택 내용 요약 (읽기 전용) */}
               <dl className="grid grid-cols-[4rem_1fr] gap-x-3 gap-y-1.5 rounded-lg bg-slate-50 px-4 py-3">
                 <dt className="text-slate-500">예약자</dt>
-                <dd>김민재 (사원)</dd>
+                <dd>{user?.name ?? "-"}</dd>
                 <dt className="text-slate-500">회의실</dt>
-                <dd>{selectedRoom.name}</dd>
+                <dd>{selectedRoom?.name}</dd>
                 <dt className="text-slate-500">시간</dt>
                 <dd className="font-semibold text-emerald-700 tabular-nums">
-                  {fakeDate} 09:00 ~ 10:00
+                  {startAt && endAt
+                    ? `${selectedDate} ${toHHMM(startAt)} ~ ${toHHMM(endAt)}`
+                    : "시간을 선택하세요"}
                 </dd>
               </dl>
 
@@ -204,15 +290,24 @@ const RoomReservation = () => {
               <input
                 type="text"
                 maxLength={100}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="회의 제목을 입력하세요 (필수)"
                 className="rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-indigo-500"
               />
+              
+              {/* 결과 안내 문구 */}
+              {message && (
+                <p className="text-xs text-slate-600">{message}</p>
+              )}
 
               <button
                 type="button"
-                className="rounded-lg bg-indigo-600 py-2.5 font-semibold text-white transition hover:bg-indigo-700"
+                onClick={handleSubmit}
+                disabled={!canSubmit}
+                className="rounded-lg bg-indigo-600 py-2.5 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                회의실 예약
+                {submitting ? "예약 중..." : "회의실 예약"}
               </button>
             </div>
           </div>
@@ -229,7 +324,7 @@ const RoomReservation = () => {
 
             {/* 화면이 크면 카드가 남은 높이만큼 커지고, 작으면 최소 높이 유지 → 내부 스크롤 없음 */}
             <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-3 p-4">
-              {fakeRooms.map((room) => {
+              {rooms.map((room) => {
             return (
             <div
                 key={room.id}
