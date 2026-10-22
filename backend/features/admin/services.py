@@ -29,7 +29,7 @@ def update_user(user_id: int, data: AdminUserUpdate, db: Session, admin: User):
         if data.role not in ("USER", "ADMIN"):
             raise InvalidRoleException
 
-        if user.id == admin.id:
+        if user.id == admin.id and data.role != user.role:
             raise SelfRoleChangeException
         user.role = data.role
 
