@@ -1,7 +1,5 @@
 // 서버로부터 내려올 데이터 타입
 
-
-
 export type UserResponse = {
   user_id: number;
   name: string;
@@ -18,32 +16,32 @@ export type BoardUpdate = {
 };
 
 export type CommentResponse = {
-  comment_id: number;
-  body: string;
-  user_id: number;
-  user: UserResponse;
-  board_id: number;
+  id: number;
+  content: string;
+  author_id: number;
+  author: UserResponse;
+  post_id: number;
   created_at: string;
 };
 
 export type CommentCreate = {
-  body: string;
-  user_id: number;
-  board_id: number;
+  content: string;
+  author_id: number;
+  post_id: number;
 };
 
 export type CommentUpdate = {
-  body: string;
+  content: string;
 };
 
 export type BoardResponse = {
   id: number;
   title: string;
-  contents: string;
-  user_id: number;
+  content: string;
+  author_id: number;
   created_at: string;
-  views: number;
-  user: UserResponse;
+  view_count: number;
+  author: UserResponse;
   comments: CommentResponse[];
 };
 

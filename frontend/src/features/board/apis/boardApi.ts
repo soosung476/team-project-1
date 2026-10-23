@@ -2,13 +2,8 @@ import axios from "axios";
 import type { BoardCreate, BoardUpdate } from "../types/board";
 import axiosInstance from "../../../common/apis/axios";
 
-const url = `http://127.0.0.1:8000/boards`;
-export const getBoards = async (
-  page: number,
-  size: number,
-  criteria: string,
-  keyword: string,
-) => {
+const url = `http://127.0.0.1:8000/board`;
+export const getBoards = async (page: number, size: number, criteria: string, keyword: string) => {
   const response = await axios.get(`${url}`, {
     params: { page, size, criteria, keyword },
   });

@@ -7,12 +7,7 @@ export type ReplyProps = {
   handleCommentEdit: (commentId: number, editContent: string) => void;
 };
 
-const ReplyComp = ({
-  comments,
-  handleCommentRemove,
-  handleCommentSubmit,
-  handleCommentEdit,
-}: ReplyProps) => {
+const ReplyComp = ({ comments, handleCommentRemove, handleCommentSubmit, handleCommentEdit }: ReplyProps) => {
   const [commentContent, setCommentContent] = useState("");
   const handleCommentSubmitWrapper = () => {
     handleCommentSubmit(commentContent);
@@ -32,8 +27,8 @@ const ReplyComp = ({
   };
   // 댓글 수정 버튼 클릭 시 수정하고자 하는 댓글 정보 관리
   const handleEditStart = (comment: CommentResponse) => {
-    setEditingCommentId(comment.comment_id);
-    setEditContent(comment.body);
+    setEditingCommentId(comment.id);
+    setEditContent(comment.content);
   };
 
   return (
@@ -49,40 +44,28 @@ const ReplyComp = ({
       {/* 댓글 목록 */}
       <div>
         {comments.length === 0 ? (
-          <div className="px-6 py-6 text-center text-sm text-slate-400">
-            등록된 댓글이 없습니다.
-          </div>
+          <div className="px-6 py-6 text-center text-sm text-slate-400">등록된 댓글이 없습니다.</div>
         ) : (
           comments.map((comment: CommentResponse) => (
-            <div
-              className="border-b border-slate-100 px-6 py-4 last:border-b-0"
-              key={comment.comment_id}
-            >
+            <div className="border-b border-slate-100 px-6 py-4 last:border-b-0" key={comment.id}>
               {/* 댓글 상단 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-50 text-sm font-semibold text-indigo-600">
-                    {comment.user.name.charAt(0)}
+                    {comment.author?.name?.charAt(0)}
                   </div>
 
                   <div>
-                    <div className="text-sm font-semibold text-slate-800">
-                      {comment.user.name}
-                    </div>
+                    <div className="text-sm font-semibold text-slate-800">{comment.author?.name}</div>
 
-                    <div className="mt-0.5 text-xs text-slate-400">
-                      {comment.created_at}
-                    </div>
+                    <div className="mt-0.5 text-xs text-slate-400">{comment.created_at}</div>
                   </div>
                 </div>
 
                 {/* 댓글 수정/삭제 버튼 */}
-                {editingCommentId !== comment.comment_id && (
+                {editingCommentId !== comment.id && (
                   <div className="flex items-center gap-3 text-xs">
-                    <button
-                      onClick={() => handleEditStart(comment)}
-                      className="text-slate-400 hover:text-indigo-600"
-                    >
+                    <button onClick={() => handleEditStart(comment)} className="text-slate-400 hover:text-indigo-600">
                       수정
                     </button>
 
@@ -90,7 +73,7 @@ const ReplyComp = ({
 
                     <button
                       className="text-slate-400 hover:text-red-500"
-                      onClick={() => handleCommentRemove(comment.comment_id)}
+                      onClick={() => handleCommentRemove(comment.id)}
                     >
                       삭제
                     </button>
@@ -99,7 +82,7 @@ const ReplyComp = ({
               </div>
 
               {/* 댓글내용 */}
-              {editingCommentId == comment.comment_id ? (
+              {editingCommentId == comment.id ? (
                 <div className="mt-3">
                   <textarea
                     onChange={(e) => setEditContent(e.target.value)}
@@ -116,7 +99,7 @@ const ReplyComp = ({
                     </button>
 
                     <button
-                      onClick={() => handleEditSaveWrapper(comment.comment_id)}
+                      onClick={() => handleEditSaveWrapper(comment.id)}
                       className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       저장
@@ -124,9 +107,7 @@ const ReplyComp = ({
                   </div>
                 </div>
               ) : (
-                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">
-                  {comment.body}
-                </p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{comment.content}</p>
               )}
             </div>
           ))

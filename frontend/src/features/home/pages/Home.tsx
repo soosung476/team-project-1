@@ -196,9 +196,9 @@ const Home = () => {
                   </h3>
 
                   <div className="flex shrink-0 gap-3 text-xs text-slate-400">
-                    <span>{post.user.name}</span>
+                    <span>{post.author?.name}</span>
                     <span>{post.created_at}</span>
-                    <span>조회 {post.views} </span>
+                    <span>조회 {post.view_count} </span>
                   </div>
 
                   <span className="text-slate-300">›</span>
