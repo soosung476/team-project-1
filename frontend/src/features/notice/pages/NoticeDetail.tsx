@@ -8,7 +8,7 @@ const NoticeDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const data = useNotice(id);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const Page = Number(searchParams.get("page")) || 1;
   const Size = Number(searchParams.get("size")) || 10;
 
@@ -18,6 +18,7 @@ const NoticeDetail = () => {
 
     try {
       const result = await delete_notice(id);
+      console.log(result);
       navigate(`/notices?page=${Page}&size=${Size}`);
     } catch (error) {
       console.log(error);

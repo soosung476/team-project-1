@@ -89,7 +89,7 @@ const NoticeList = () => {
 
                 <td className="px-6 py-5 text-center text-slate-500">{post.author.name}</td>
 
-                <td className="px-6 py-5 text-center text-slate-400">{post.created_at}</td>
+                <td className="px-6 py-5 text-center text-slate-400">{post.created_at.slice(0, 10)}</td>
               </tr>
             ))}
           </tbody>
