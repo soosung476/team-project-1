@@ -1,6 +1,8 @@
 // 공지사항 상세 화면
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useNotice from "../hooks/useNotice";
+import { useAuth } from "../../user/context/AuthContext";
+import { delete_notice } from "../apis/noticeApi";
 
 const NoticeDetail = () => {
   const { id } = useParams();
@@ -10,7 +12,17 @@ const NoticeDetail = () => {
   const Page = Number(searchParams.get("page")) || 1;
   const Size = Number(searchParams.get("size")) || 10;
 
-  // handleRemove
+  const { isLoggedIn, user } = useAuth();
+  const handleRemove = async (id: string | undefined) => {
+    if (!id) return;
+
+    try {
+      const result = await delete_notice(id);
+      navigate(`/notices?page=${Page}&size=${Size}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div>
@@ -27,7 +39,6 @@ const NoticeDetail = () => {
           <div className="mt-4 flex items-center gap-4 text-sm text-slate-400">
             <span className="font-medium text-slate-600">{data.author.name}</span>
             <span>{data.created_at}</span>
-            <span>조회</span>
           </div>
         </div>
 
@@ -45,34 +56,32 @@ const NoticeDetail = () => {
             목록
           </Link>
 
-          <div className="flex gap-2">
-            <button
-              onClick={() =>
-                navigate({
-                  pathname: `/notice/${id}/edit`,
-                  search: `?page=${Page}&size=${Size}`,
-                })
-              }
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50 
-              disabled:bg-slate-100 disabled:text-slate-400 disabled::border-slate-200"
-              //disabled={author?.author_id !== notice.user_id}
-            >
-              수정
-            </button>
+          {user?.role == "ADMIN" && isLoggedIn && (
+            <div className="flex gap-2">
+              <button
+                onClick={() =>
+                  navigate({
+                    pathname: `/notices/${id}/edit`,
+                    search: `?page=${Page}&size=${Size}`,
+                  })
+                }
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50 "
+              >
+                수정
+              </button>
 
-            <button
-              //   onClick={() => {
-              //     if (confirm("정말로 삭제하시겠습니까?")) {
-              //       handleRemove(id);
-              //     }
-              //  }}
-              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-800
-              disabled:bg-slate-100 disabled:text-slate-400 disabled::border-slate-300"
-              //disabled={user?.user_id !== board.user_id}
-            >
-              삭제
-            </button>
-          </div>
+              <button
+                onClick={() => {
+                  if (confirm("정말로 삭제하시겠습니까?")) {
+                    handleRemove(id);
+                  }
+                }}
+                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
+              >
+                삭제
+              </button>
+            </div>
+          )}
         </div>
       </article>
     </div>
