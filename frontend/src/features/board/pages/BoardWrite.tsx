@@ -12,8 +12,8 @@ const BoardWrite = () => {
       const result = await postBoard(board);
       console.log(result);
       navigate(`/boards?page=1&size=${size}`);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(JSON.stringify(error.response?.data, null, 2));
     }
   };
 
