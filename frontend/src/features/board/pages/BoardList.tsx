@@ -20,16 +20,31 @@ const BoardList = () => {
   const endPage = Math.min(startPage + pageSize - 1, total_pages);
 
   // 검색
-  const [searchForm, setSearchForm] = useState({
-    criteria: criParam,
-    keyword: keyParam,
-  });
+  const [searchForm, setSearchForm] = useState({ criteria: criParam, keyword: keyParam });
   const { criteria, keyword } = searchForm;
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setSearchForm((prev) => ({ ...prev, [name]: value }));
+    setSearchForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
+  // 검색 버튼
+  const onSearchClick = () => {
+    setSearchParams({
+      page: "1",
+      size: String(size),
+      criteria: searchForm.criteria,
+      keyword: searchForm.keyword,
+    });
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key == "Enter") {
+      onSearchClick();
+    }
+  };
   const onPageChange = (page: number) => {
     setSearchParams({
       page: String(page),
@@ -48,6 +63,17 @@ const BoardList = () => {
       keyword,
     });
   };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+        <p className="text-slate-600">로그인이 필요합니다</p>
+        <Link to="/users/signin" className="mt-4 inline-block text-indigo-600">
+          로그인하러 가기
+        </Link>
+      </div>
+    );
+  }
 
   if (loading) {
     return <p>Loading....</p>;
@@ -94,6 +120,7 @@ const BoardList = () => {
             value={keyword}
             name="keyword"
             onChange={onSearchChange}
+            onKeyDown={onKeyDown}
             type="text"
             placeholder="검색어를 입력하세요"
             className="flex-1 px-3 py-2 text-sm outline-none"
@@ -143,7 +170,7 @@ const BoardList = () => {
 
                 <td className="px-6 py-2.5 text-center text-slate-500">{post.author.name}</td>
 
-                <td className="px-6 py-2.5 text-center text-slate-400">{post.created_at}</td>
+                <td className="px-6 py-2.5 text-center text-slate-400">{post.created_at.slice(0, 10)}</td>
 
                 <td className="px-6 py-2.5 text-center text-slate-400">{post.view_count}</td>
               </tr>

@@ -53,8 +53,6 @@ const BoardDetail = () => {
     if (!id || !user) return;
     try {
       const comment: CommentCreate = {
-        author_id: user.id,
-        post_id: Number(id),
         content: commentContent,
       };
       const result = await postComment(Number(id), comment);

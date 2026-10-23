@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, selectinload
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from features.board.models import BoardPost as Board
 from features.comment.models import BoardComment as Comment
 from features.board.schemas import BoardCreate, BoardUpdate
@@ -7,6 +7,7 @@ from features.board.exceptions import BoardNotFoundException, UserCredentialsExc
 import math
 from features.user.models import User
 
+#게시글 조회수
 def select_one(db: Session, id: int):
 
     stmt = (
@@ -22,6 +23,10 @@ def select_one(db: Session, id: int):
 
     if board is None:
         raise BoardNotFoundException
+    
+    # 1번 조회 할 때마다 1씩 증가
+    board.view_count = (board.view_count or 0) + 1
+    db.commit()
 
     return board
 
@@ -63,9 +68,24 @@ def recentPosts(db: Session, limit: int = 5 ):
     return db.query(Board).order_by(Board.created_at.desc()).limit(limit).all()
 
 # 전체 조회
-def select_all(db: Session, page: int, size: int):
+def select_all(db: Session, page: int, size: int, criteria: str = "tc", keyword: str = ""):
 
     query = db.query(Board)
+
+    if keyword:
+        if criteria == "t":
+            query = query.filter(Board.title.contains(keyword))
+        elif criteria == "w":
+            query = query.join(User, Board.author_id == User.id).filter(
+                User.name.contains(keyword)
+            )
+        else:
+            query = query.filter(
+                or_(
+                    Board.title.contains(keyword),
+                    Board.content.contains(keyword),
+                )
+            )
 
     total = query.count()
     offset = (page - 1) * size
@@ -78,6 +98,8 @@ def select_all(db: Session, page: int, size: int):
         "page": page,
         "size": size,
         "total_pages": total_pages,
+        "criteria": criteria,
+        "keyword": keyword,
     }
 
 # 삭제
