@@ -5,6 +5,7 @@ import ReplyComp from "../components/ReplyComp";
 import useBoard from "../hooks/useBoard";
 import type { CommentCreate } from "../types/board";
 import { useAuth } from "../../user/context/AuthContext";
+import axios from "axios";
 
 const BoardDetail = () => {
   const { id } = useParams();
@@ -34,12 +35,13 @@ const BoardDetail = () => {
   };
 
   const handleCommentRemove = async (commentId: number) => {
+    if (!id) return;
     if (!confirm("댓글을 삭제하시겠습니까?")) {
       return;
     }
 
     try {
-      const result = await deleteComment(commentId);
+      const result = await deleteComment(Number(id), commentId);
       console.log(result);
       refresh();
     } catch (error) {
@@ -48,25 +50,29 @@ const BoardDetail = () => {
   };
 
   const handleCommentSubmit = async (commentContent: string) => {
-    if (!id) return;
+    if (!id || !user) return;
     try {
       const comment: CommentCreate = {
-        author_id: 1,
+        author_id: user.id,
         post_id: Number(id),
         content: commentContent,
       };
-      const result = await postComment(comment);
+      const result = await postComment(Number(id), comment);
       console.log(result);
       refresh();
     } catch (error) {
-      console.log(error);
+      if (axios.isAxiosError(error)) {
+        console.log("422 detail:", JSON.stringify(error.response?.data, null, 2));
+      } else {
+        console.log(error);
+      }
     }
   };
 
   const handleCommentEdit = async (commentId: number, editContent: string) => {
-    if (!commentId) return;
+    if (!id || !commentId) return;
     try {
-      const result = await putComment(commentId, { content: editContent });
+      const result = await putComment(Number(id), commentId, { content: editContent });
       console.log(result);
       refresh();
     } catch (error) {
@@ -142,7 +148,7 @@ const BoardDetail = () => {
       </article>
       {/* 댓글 보여주기 posts/${id}/cmments */}
       <ReplyComp
-        comments={board.comments}
+        comment={board.comments}
         handleCommentRemove={handleCommentRemove}
         handleCommentSubmit={handleCommentSubmit}
         handleCommentEdit={handleCommentEdit}

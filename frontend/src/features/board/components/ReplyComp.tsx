@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { CommentResponse } from "../types/board";
 export type ReplyProps = {
-  comments: CommentResponse[];
+  comment: CommentResponse[];
   handleCommentRemove: (commentId: number) => void;
   handleCommentSubmit: (commentContent: string) => void;
   handleCommentEdit: (commentId: number, editContent: string) => void;
 };
 
-const ReplyComp = ({ comments, handleCommentRemove, handleCommentSubmit, handleCommentEdit }: ReplyProps) => {
+const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCommentEdit }: ReplyProps) => {
   const [commentContent, setCommentContent] = useState("");
   const handleCommentSubmitWrapper = () => {
     handleCommentSubmit(commentContent);
@@ -37,26 +37,26 @@ const ReplyComp = ({ comments, handleCommentRemove, handleCommentSubmit, handleC
       <div className="border-b border-slate-200 px-6 py-3">
         <h2 className="text-base font-bold">
           댓글
-          <span className="ml-1 text-indigo-600">{comments.length ?? 0}</span>
+          <span className="ml-1 text-indigo-600">{comment.length ?? 0}</span>
         </h2>
       </div>
 
       {/* 댓글 목록 */}
       <div>
-        {comments.length === 0 ? (
+        {comment.length === 0 ? (
           <div className="px-6 py-6 text-center text-sm text-slate-400">등록된 댓글이 없습니다.</div>
         ) : (
-          comments.map((comment: CommentResponse) => (
+          comment.map((comment: CommentResponse) => (
             <div className="border-b border-slate-100 px-6 py-4 last:border-b-0" key={comment.id}>
               {/* 댓글 상단 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-50 text-sm font-semibold text-indigo-600">
-                    {comment.author?.name?.charAt(0)}
+                    {comment.author.name.charAt(0)}
                   </div>
 
                   <div>
-                    <div className="text-sm font-semibold text-slate-800">{comment.author?.name}</div>
+                    <div className="text-sm font-semibold text-slate-800">{comment.author.name}</div>
 
                     <div className="mt-0.5 text-xs text-slate-400">{comment.created_at}</div>
                   </div>

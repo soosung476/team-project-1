@@ -1,33 +1,29 @@
-// 서버로부터 내려올 데이터 타입
-
-export type UserResponse = {
-  user_id: number;
+export type AuthorBrief = {
+  id: number;
   name: string;
-};
-export type BoardCreate = {
-  title: string;
-  contents: string;
-  user_id: number;
-};
-
-export type BoardUpdate = {
-  title: string;
-  contents: string;
 };
 
 export type CommentResponse = {
   id: number;
   content: string;
-  author_id: number;
-  author: UserResponse;
   post_id: number;
+  author_id: number;
+  author: AuthorBrief;
   created_at: string;
+};
+
+export type BoardCreate = {
+  title: string;
+  content: string;
+};
+
+export type BoardUpdate = {
+  title: string;
+  content: string;
 };
 
 export type CommentCreate = {
   content: string;
-  author_id: number;
-  post_id: number;
 };
 
 export type CommentUpdate = {
@@ -36,36 +32,28 @@ export type CommentUpdate = {
 
 export type BoardResponse = {
   id: number;
+  author_id: number;
   title: string;
   content: string;
-  author_id: number;
-  created_at: string;
   view_count: number;
-  author: UserResponse;
+  created_at: string;
+  updated_at: string;
+  author: AuthorBrief;
   comments: CommentResponse[];
 };
 
+export type BoardListItem = {
+  id: number;
+  title: string;
+  view_count: number;
+  created_at: string;
+  author: AuthorBrief;
+};
+
 export type BoardPageRespons = {
-  items: BoardResponse[];
+  items: BoardListItem[];
   total: number;
   page: number;
   size: number;
   total_pages: number;
-  criteria: string;
-  keyword: string;
 };
-
-export type Board = {
-  userId: number;
-  title: string;
-};
-
-export type Comment = {
-  postId: number;
-  id: number;
-  name: string;
-  email: string;
-  body: string;
-};
-
-export type BoardUpsert = Omit<Board, "id"> & { id?: number };

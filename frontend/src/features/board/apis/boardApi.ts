@@ -35,7 +35,7 @@ export const deleteBoard = async (id: string) => {
   return response.data;
 };
 
-export const getComments = async (id: string) => {
-  const response = await axiosInstance.get(`${url}/${id}/comments`);
+export const getComment = async (id: string) => {
+  const response = await axiosInstance.get(`${url}/${id}/comment`);
   return response.data;
 };

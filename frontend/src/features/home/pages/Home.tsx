@@ -51,8 +51,7 @@ const Home = () => {
             <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
               개발에 대한 생각과 경험을 자유롭게 공유하는 커뮤니티입니다.
               <br />
-              궁금한 것이 있다면 질문하고, 알고 있는 것이 있다면 함께
-              나눠보세요.
+              궁금한 것이 있다면 질문하고, 알고 있는 것이 있다면 함께 나눠보세요.
             </p>
           </div>
 
@@ -86,9 +85,7 @@ const Home = () => {
           to="/boards"
           className="group flex gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-lg">
-            💬
-          </div>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-lg">💬</div>
 
           <div>
             <h2 className="font-semibold">자유게시판</h2>
@@ -99,9 +96,7 @@ const Home = () => {
               다양한 의견을 공유해보세요.
             </p>
 
-            <div className="mt-2 text-sm font-medium text-indigo-600">
-              게시판 보기 →
-            </div>
+            <div className="mt-2 text-sm font-medium text-indigo-600">게시판 보기 →</div>
           </div>
         </Link>
 
@@ -115,9 +110,7 @@ const Home = () => {
           to="/boards/write"
           className="group flex gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-lg">
-            ✎
-          </div>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-lg">✎</div>
 
           <div>
             <h2 className="font-semibold">새 글 작성</h2>
@@ -128,9 +121,7 @@ const Home = () => {
               새로운 게시글로 작성해보세요.
             </p>
 
-            <div className="mt-2 text-sm font-medium text-indigo-600">
-              글 작성하기 →
-            </div>
+            <div className="mt-2 text-sm font-medium text-indigo-600">글 작성하기 →</div>
           </div>
         </Link>
 
@@ -138,9 +129,7 @@ const Home = () => {
           to="/about"
           className="group flex gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-lg">
-            ✦
-          </div>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-lg">✦</div>
 
           <div>
             <h2 className="font-semibold">DEV BOARD</h2>
@@ -151,9 +140,7 @@ const Home = () => {
               자세한 내용을 확인해보세요.
             </p>
 
-            <div className="mt-2 text-sm font-medium text-indigo-600">
-              자세히 보기 →
-            </div>
+            <div className="mt-2 text-sm font-medium text-indigo-600">자세히 보기 →</div>
           </div>
         </Link>
       </section>
@@ -165,15 +152,10 @@ const Home = () => {
           <div className="mb-2 flex items-end justify-between">
             <div>
               <h2 className="text-lg font-bold">최근 게시글</h2>
-              <p className="text-sm text-slate-500">
-                최근에 작성된 게시글을 확인해보세요.
-              </p>
+              <p className="text-sm text-slate-500">최근에 작성된 게시글을 확인해보세요.</p>
             </div>
 
-            <Link
-              to="/boards"
-              className="text-sm font-medium text-slate-500 hover:text-indigo-600"
-            >
+            <Link to="/boards" className="text-sm font-medium text-slate-500 hover:text-indigo-600">
               전체보기 →
             </Link>
           </div>
@@ -187,16 +169,12 @@ const Home = () => {
                   to={`/boards/${post.id}`}
                   className="flex items-center gap-4 px-5 py-2.5 transition hover:bg-slate-50"
                 >
-                  <span className="hidden w-8 text-center text-sm text-slate-300 sm:block">
-                    {post.id}
-                  </span>
+                  <span className="hidden w-8 text-center text-sm text-slate-300 sm:block">{post.id}</span>
 
-                  <h3 className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
-                    {post.title}
-                  </h3>
+                  <h3 className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">{post.title}</h3>
 
                   <div className="flex shrink-0 gap-3 text-xs text-slate-400">
-                    <span>{post.author?.name}</span>
+                    <span>{post.author.name}</span>
                     <span>{post.created_at}</span>
                     <span>조회 {post.view_count} </span>
                   </div>
@@ -211,13 +189,9 @@ const Home = () => {
         {/* Bottom Banner */}
         <section className="flex flex-col justify-between gap-4 rounded-xl border border-indigo-100 bg-indigo-50 px-6 py-5">
           <div>
-            <h2 className="font-semibold text-slate-900">
-              여러분의 이야기를 들려주세요.
-            </h2>
+            <h2 className="font-semibold text-slate-900">여러분의 이야기를 들려주세요.</h2>
 
-            <p className="mt-1 text-sm text-slate-500">
-              작은 질문 하나가 새로운 대화의 시작이 될 수 있습니다.
-            </p>
+            <p className="mt-1 text-sm text-slate-500">작은 질문 하나가 새로운 대화의 시작이 될 수 있습니다.</p>
           </div>
 
           <Link
