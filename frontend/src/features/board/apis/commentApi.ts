@@ -1,19 +1,20 @@
 import axios from "axios";
 import type { CommentCreate, CommentUpdate } from "../types/board";
+import axiosInstance from "../../../common/apis/axios";
 
-const url = `http://127.0.0.1:8000/comments`;
+const url = "http://127.0.0.1:8000";
 
-export const postComment = async (comment: CommentCreate) => {
-  const response = await axios.post(`${url}`, comment);
+export const postComment = async (boardId: number, comment: CommentCreate) => {
+  const response = await axiosInstance.post(`${url}/boards/${boardId}/comments`, comment);
   return response.data;
 };
 
-export const putComment = async (id: number, comment: CommentUpdate) => {
-  const response = await axios.put(`${url}/${id}`, comment);
+export const putComment = async (boardId: number, id: number, comment: CommentUpdate) => {
+  const response = await axiosInstance.put(`${url}/boards/${boardId}/comments/${id}`, comment);
   return response.data;
 };
 
-export const deleteComment = async (id: number) => {
-  const response = await axios.delete(`${url}/${id}`);
+export const deleteComment = async (boardId: number, id: number) => {
+  const response = await axiosInstance.delete(`${url}/boards/${boardId}/comments/${id}`);
   return response.data;
 };
