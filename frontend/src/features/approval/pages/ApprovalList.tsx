@@ -12,6 +12,14 @@ const ApprovalList = () => {
     return <p>로딩중입니다.</p>;
   }
 
+  const changeColor = (type: string) => {
+    const base = "border-b-2 px-4 py-2 text-sm";
+    if (listType === type) {
+      return `${base} border-indigo-600 font-semibold text-indigo-600`;
+    }
+    return `${base} border-transparent font-medium text-slate-500 hover:text-slate-800`;
+  };
+
   return (
     <div>
       <div className="mb-3 text-sm text-slate-400">
@@ -47,19 +55,19 @@ const ApprovalList = () => {
       <div className="mb-4 flex gap-1 border-b border-slate-200">
         <button
           onClick={() => setListType("drafted")}
-          className="border-b-2 border-indigo-600 px-4 py-2 text-sm font-semibold text-indigo-600"
+          className={`${changeColor("drafted")}`}
         >
-          내 기안
+          진행중
         </button>
         <button
           onClick={() => setListType("approved")}
-          className="border-b-2 border-transparent px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800"
+          className={`${changeColor("approved")}`}
         >
           승인됨
         </button>
         <button
           onClick={() => setListType("rejected")}
-          className="border-b-2 border-transparent px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800"
+          className={`${changeColor("rejected")}`}
         >
           반려됨
         </button>
