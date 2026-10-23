@@ -1,6 +1,6 @@
 
 export type MeetingRoomResponse = {
-    id: number 
+    id: number; 
     name: string;
     capacity: number;
     location: string;
@@ -8,6 +8,7 @@ export type MeetingRoomResponse = {
 
 export type ReservationResponse = {
     id: number;
+    user_id: number;
     title: string;
     start_at: string;
     end_at: string;
@@ -33,9 +34,9 @@ export type ReservationDetailResponse = {
     room_id: number;
     room_name: string;
     title: string;
-    start_at: Date;
-    end_at: Date;
+    start_at: string;
+    end_at: string;
     user_name: string;
     user_position: string;
-    created_at: Date;
+    created_at: string;
 }
