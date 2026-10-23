@@ -4,8 +4,13 @@ from features.comment.models import BoardComment
 from features.board.exceptions import CommentNotFoundException
 
 # 댓글 추가
-def comment_create(data: CommentCreate, db: Session):
-    comment = BoardComment(content=data.content, author_id=data.author_id, post_id=data.post_id)
+# 댓글 추가
+def comment_create(data: CommentCreate, post_id: int, author_id: int, db: Session):
+    comment = BoardComment(
+        content=data.content,
+        author_id=author_id,
+        post_id=post_id,
+    )
     db.add(comment)
     db.commit()
     db.refresh(comment)
