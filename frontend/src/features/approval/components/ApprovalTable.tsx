@@ -1,20 +1,12 @@
 import { Link } from "react-router-dom";
 import type { ApprovalListItem } from "../types/approval";
+import { statusColor, statusLabel } from "../functions/approvalFunction";
+import { useAuth } from "../../user/context/AuthContext";
 
 // 결재 목록 표 (결재 대기·내 기안·승인됨·반려됨 화면이 같이 씀)
 
 const ApprovalTable = ({ items }: { items: ApprovalListItem[] }) => {
-  const statusLabel = (status: string) => {
-    if (status === "APPROVED") return "승인됨";
-    if (status === "REJECTED") return "반려됨";
-    return "진행중";
-  };
-
-  const statusColor = (status: string) => {
-    if (status === "APPROVED") return "text-green-600 bg-green-50";
-    if (status === "REJECTED") return "text-red-600 bg-red-50";
-    return "text-blue-600 bg-blue-50";
-  };
+  const { user } = useAuth();
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <table className="w-full text-sm">
@@ -58,7 +50,13 @@ const ApprovalTable = ({ items }: { items: ApprovalListItem[] }) => {
                     to={`/approvals/${item.id}`}
                     className="font-medium text-slate-800 hover:text-indigo-600"
                   >
-                    {item.title}
+                    {item.title}{" "}
+                    {item.drafter.id === user?.id &&
+                      item.status === "REJECTED" && (
+                        <span className="rounded-full  px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50">
+                          재작성가능
+                        </span>
+                      )}
                   </Link>
                 </td>
                 <td className="px-6 py-2.5 text-center text-slate-500">
