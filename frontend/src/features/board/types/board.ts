@@ -24,8 +24,6 @@ export type BoardUpdate = {
 
 export type CommentCreate = {
   content: string;
-  post_id: number;
-  author_id: number;
 };
 
 export type CommentUpdate = {

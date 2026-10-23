@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { deleteBoard } from "../apis/boardApi";
 import { deleteComment, postComment, putComment } from "../apis/commentApi";
@@ -6,6 +5,7 @@ import ReplyComp from "../components/ReplyComp";
 import useBoard from "../hooks/useBoard";
 import type { CommentCreate } from "../types/board";
 import { useAuth } from "../../user/context/AuthContext";
+import axios from "axios";
 
 const BoardDetail = () => {
   const { id } = useParams();
@@ -53,9 +53,9 @@ const BoardDetail = () => {
     if (!id || !user) return;
     try {
       const comment: CommentCreate = {
-        content: commentContent,
-        post_id: Number(id),
         author_id: user.id,
+        post_id: Number(id),
+        content: commentContent,
       };
       const result = await postComment(Number(id), comment);
       console.log(result);
