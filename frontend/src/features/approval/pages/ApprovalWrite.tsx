@@ -1,5 +1,3 @@
-import { useAuth } from "../../user/context/AuthContext";
-
 // 기안하기
 const ApprovalWrite = () => {
   return (
