@@ -5,7 +5,7 @@ import { put_notice } from "../apis/noticeApi";
 import { useState, useEffect } from "react";
 
 const NoticeEdit = () => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<NoticeUpdate>({
     title: "",
     content: "",
     is_pinned: "N",
@@ -30,7 +30,7 @@ const NoticeEdit = () => {
       is_pinned: data.is_pinned,
     });
   }, [data]);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const Page = Number(searchParams.get("page")) || 1;
   const Size = Number(searchParams.get("size")) || 10;
 
@@ -39,6 +39,7 @@ const NoticeEdit = () => {
 
     try {
       const result = await put_notice(data, id);
+      console.log(result);
 
       navigate({
         pathname: `/notices/${id}`,

@@ -16,6 +16,8 @@ import ApprovalInbox from "./features/approval/pages/ApprovalInbox";
 import ApprovalWrite from "./features/approval/pages/ApprovalWrite";
 import ApprovalDetail from "./features/approval/pages/ApprovalDetail";
 import NoticeDetail from "./features/notice/pages/NoticeDetail";
+import NoticeWrite from "./features/notice/pages/NoticeWrite";
+import NoticeEdit from "./features/notice/pages/NoticeEdit";
 
 function App() {
   return (
@@ -24,7 +26,6 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Home />} />
 
-          <Route path="/notices" element={<NoticeList />}></Route>
           <Route path="/approvals">
             <Route index element={<ApprovalList />} />
             <Route path="inbox" element={<ApprovalInbox />} />
@@ -34,6 +35,8 @@ function App() {
           <Route path="/notices">
             <Route index element={<NoticeList />} />
             <Route path=":id" element={<NoticeDetail />} />
+            <Route path=":id/edit" element={<NoticeEdit />} />
+            <Route path="write" element={<NoticeWrite />} />
           </Route>
           <Route path="/approvals"></Route>
           <Route path="/rooms" element={<RoomReservation />} />
