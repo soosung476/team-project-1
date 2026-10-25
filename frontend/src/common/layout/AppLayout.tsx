@@ -17,12 +17,19 @@ const AppLayout = () => {
           {/* 오른쪽 묶음: 관리자페이지 + 로그인/로그아웃 (div로 묶어야 둘이 붙어서 오른쪽에 섬) */}
           <div className="flex items-center gap-3">
             {user?.role == "ADMIN" && isLoggedIn && (
+              <>
               <button
                 className="text-xs text-slate-500 hover:text-slate-900 cursor-pointer"
                 onClick={() => navigate("/admin/users")}
-              >
+                >
                 관리자페이지
               </button>
+              <button 
+               className="text-xs text-slate-500 hover:text-slate-900 cursor-pointer"
+               onClick={() => navigate("/department")}>
+                부서관리
+              </button>
+              </>
             )}
 
             {!isLoggedIn ? (
