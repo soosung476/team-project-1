@@ -5,7 +5,7 @@ import type { NoticeListResponse } from "../types/notice";
 import { get_notices } from "../apis/noticeApi";
 
 // useState 가 불러올 때 데이터 기본값 정의
-export const BaseNotice: NoticeListResponse = {
+export const BaseNotices: NoticeListResponse = {
   items: [],
   page: 1,
   size: 10,
@@ -15,7 +15,7 @@ export const BaseNotice: NoticeListResponse = {
 
 const useNotices = (page: number, size: number) => {
   // useState 를 사용해 값 변경 받기
-  const [data, setData] = useState<NoticeListResponse>(BaseNotice);
+  const [data, setData] = useState<NoticeListResponse>(BaseNotices);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +29,7 @@ const useNotices = (page: number, size: number) => {
     };
 
     fetchData();
-  }, []);
+  }, [page, size]);
   // 밖으로 보내주기
   return data;
 };

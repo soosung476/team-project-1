@@ -4,13 +4,25 @@ from db.database import get_db
 from features.comment.service import comment_create, comment_update, comment_delete
 from features.comment.schemas import CommentCreate, CommentUpdate
 from features.board.exceptions import CommentNotFoundException
+from features.user.models import User
+from core.dependencies import get_current_user
 
-comment_router = APIRouter(tags=["Comments"])
+comment_router = APIRouter(prefix="/boards/{board_id}/comments", tags=["Comments"])
 
 # 댓글 추가
-@comment_router.post("/", response_model=dict)
-async def post_comment(data: CommentCreate, db: Session = Depends(get_db)):
-    comment = comment_create(data, db=db)
+@comment_router.post("", response_model=dict)
+async def post_comment(
+    board_id: int,
+    data: CommentCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    comment = comment_create(
+        data=data,
+        post_id=board_id,
+        author_id=current_user.id,
+        db=db,
+    )
     return {"message": f"comment {comment.id} 번 등록 완료"}
 
 # 댓글 수정

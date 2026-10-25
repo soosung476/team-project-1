@@ -8,6 +8,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import useNotices from "../hooks/useNotices";
 import { useAuth } from "../../user/context/AuthContext";
+import Pagination from "../components/Pagination";
 
 const NoticeList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,13 +18,22 @@ const NoticeList = () => {
   const data = useNotices(Page, Size);
   const { total, total_pages } = data;
 
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
+  const pageSize = 5;
+  const startpage = Math.floor((Page - 1) / pageSize) * pageSize + 1;
+  const endpage = Math.min(startpage + pageSize - 1, total_pages);
+  const onPageChange = (page: number) => {
+    setSearchParams({
+      page: String(page),
+      size: String(Size),
+    });
+  };
 
   return (
     <div>
       <div className="mb-8 text-sm text-slate-400">
         Home <span className="mx-2">/</span>
-        <span className="text-slate-600">게시판</span>
+        <span className="text-slate-600">공지사항</span>
       </div>
 
       <div className="mb-8 flex items-end justify-between">
@@ -33,12 +43,12 @@ const NoticeList = () => {
           <p className="mt-2 text-slate-500">공지사항 내용을 확인하세요.</p>
         </div>
 
-        {isLoggedIn && (
+        {user?.role == "ADMIN" && isLoggedIn && (
           <Link
-            to="/boards/write"
+            to="/notices/write"
             className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
           >
-            ✍️ 글쓰기
+            글쓰기
           </Link>
         )}
       </div>
@@ -57,33 +67,41 @@ const NoticeList = () => {
               <th className="px-6 py-4 text-left font-medium text-slate-500">제목</th>
               <th className="w-32 px-6 py-4 text-center font-medium text-slate-500">작성자</th>
               <th className="w-32 px-6 py-4 text-center font-medium text-slate-500">작성일</th>
-              <th className="w-24 px-6 py-4 text-center font-medium text-slate-500">조회</th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-slate-100">
             {data.items.map((post) => (
-              <tr key={post.id} className="transition hover:bg-slate-50">
+              <tr
+                key={post.id}
+                className={post.is_pinned === "Y" ? `transition bg-slate-200` : `transition hover:bg-slate-50`}
+              >
                 <td className="px-6 py-5 text-center text-slate-400">{post.id}</td>
+
                 <td className="px-6 py-5">
                   <Link
-                    to={`/boards/${post.id}?page=${Page}&size=${Size}`}
+                    to={`/notices/${post.id}?page=${Page}&size=${Size}`}
                     className="font-medium text-slate-800 hover:text-indigo-600"
                   >
-                    {post.title}
+                    {post.is_pinned === "Y" ? `[고정] ${post.title}` : `${post.title}`}
                   </Link>
                 </td>
 
                 <td className="px-6 py-5 text-center text-slate-500">{post.author.name}</td>
 
-                <td className="px-6 py-5 text-center text-slate-400">{post.created_at}</td>
-
-                <td className="px-6 py-5 text-center text-slate-400">2</td>
+                <td className="px-6 py-5 text-center text-slate-400">{post.created_at.slice(0, 10)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <Pagination
+        currentPage={Page}
+        start={startpage}
+        end={endpage}
+        totalPages={total_pages}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 };

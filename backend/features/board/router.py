@@ -29,9 +29,15 @@ async def get_board_recents(db: Session = Depends(get_db)):
 
 # 전체 조회
 @board_router.get("", response_model=BoardPageResponse)
-async def get_boards(db: Session = Depends(get_db), page: int = 1, size: int = 10):
+async def get_boards(
+    db: Session = Depends(get_db), 
+    page: int = 1, 
+    size: int = 10,
+    criteria: str = "tc",
+    keyword: str = "",
+    ):
 
-    result = select_all(db=db, page=page, size=size)
+    result = select_all(db=db, page=page, size=size, criteria=criteria, keyword=keyword )
 
     return result
 

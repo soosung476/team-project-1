@@ -20,18 +20,31 @@ const BoardList = () => {
   const endPage = Math.min(startPage + pageSize - 1, total_pages);
 
   // 검색
-  const [searchForm, setSearchForm] = useState({
-    criteria: criParam,
-    keyword: keyParam,
-  });
+  const [searchForm, setSearchForm] = useState({ criteria: criParam, keyword: keyParam });
   const { criteria, keyword } = searchForm;
-  const onSearchChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setSearchForm((prev) => ({ ...prev, [name]: value }));
+    setSearchForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
+  // 검색 버튼
+  const onSearchClick = () => {
+    setSearchParams({
+      page: "1",
+      size: String(size),
+      criteria: searchForm.criteria,
+      keyword: searchForm.keyword,
+    });
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key == "Enter") {
+      onSearchClick();
+    }
+  };
   const onPageChange = (page: number) => {
     setSearchParams({
       page: String(page),
@@ -51,6 +64,17 @@ const BoardList = () => {
     });
   };
 
+  if (!isLoggedIn) {
+    return (
+      <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
+        <p className="text-slate-600">로그인이 필요합니다</p>
+        <Link to="/users/signin" className="mt-4 inline-block text-indigo-600">
+          로그인하러 가기
+        </Link>
+      </div>
+    );
+  }
+
   if (loading) {
     return <p>Loading....</p>;
   }
@@ -66,9 +90,7 @@ const BoardList = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">자유게시판</h1>
 
-          <p className="mt-1 text-sm text-slate-500">
-            다양한 이야기를 자유롭게 나눠보세요.
-          </p>
+          <p className="mt-1 text-sm text-slate-500">다양한 이야기를 자유롭게 나눠보세요.</p>
         </div>
         {isLoggedIn && (
           <Link
@@ -98,15 +120,13 @@ const BoardList = () => {
             value={keyword}
             name="keyword"
             onChange={onSearchChange}
+            onKeyDown={onKeyDown}
             type="text"
             placeholder="검색어를 입력하세요"
             className="flex-1 px-3 py-2 text-sm outline-none"
           />
 
-          <button
-            onClick={onSeachClick}
-            className="px-5 text-sm font-medium text-slate-600 hover:bg-slate-50"
-          >
+          <button onClick={onSeachClick} className="px-5 text-sm font-medium text-slate-600 hover:bg-slate-50">
             검색
           </button>
         </div>
@@ -114,8 +134,7 @@ const BoardList = () => {
 
       {/* Count */}
       <div className="mb-2 text-sm text-slate-500">
-        전체 <span className="font-semibold text-slate-900">{total}</span>개의
-        게시글
+        전체 <span className="font-semibold text-slate-900">{total}</span>개의 게시글
       </div>
 
       {/* Table */}
@@ -123,34 +142,22 @@ const BoardList = () => {
         <table className="w-full text-sm">
           <thead className="border-b border-slate-200 bg-slate-50">
             <tr>
-              <th className="w-20 px-6 py-2.5 text-center font-medium text-slate-500">
-                번호
-              </th>
+              <th className="w-20 px-6 py-2.5 text-center font-medium text-slate-500">번호</th>
 
-              <th className="px-6 py-2.5 text-left font-medium text-slate-500">
-                제목
-              </th>
+              <th className="px-6 py-2.5 text-left font-medium text-slate-500">제목</th>
 
-              <th className="w-32 px-6 py-2.5 text-center font-medium text-slate-500">
-                작성자
-              </th>
+              <th className="w-32 px-6 py-2.5 text-center font-medium text-slate-500">작성자</th>
 
-              <th className="w-32 px-6 py-2.5 text-center font-medium text-slate-500">
-                작성일
-              </th>
+              <th className="w-32 px-6 py-2.5 text-center font-medium text-slate-500">작성일</th>
 
-              <th className="w-24 px-6 py-2.5 text-center font-medium text-slate-500">
-                조회
-              </th>
+              <th className="w-24 px-6 py-2.5 text-center font-medium text-slate-500">조회</th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-slate-100">
             {data.items.map((post) => (
               <tr key={post.id} className="transition hover:bg-slate-50">
-                <td className="px-6 py-2.5 text-center text-slate-400">
-                  {post.id}
-                </td>
+                <td className="px-6 py-2.5 text-center text-slate-400">{post.id}</td>
 
                 <td className="px-6 py-2.5">
                   <Link
@@ -161,17 +168,11 @@ const BoardList = () => {
                   </Link>
                 </td>
 
-                <td className="px-6 py-2.5 text-center text-slate-500">
-                  {post.user.name}
-                </td>
+                <td className="px-6 py-2.5 text-center text-slate-500">{post.author.name}</td>
 
-                <td className="px-6 py-2.5 text-center text-slate-400">
-                  {post.created_at}
-                </td>
+                <td className="px-6 py-2.5 text-center text-slate-400">{post.created_at.slice(0, 10)}</td>
 
-                <td className="px-6 py-2.5 text-center text-slate-400">
-                  {post.views}
-                </td>
+                <td className="px-6 py-2.5 text-center text-slate-400">{post.view_count}</td>
               </tr>
             ))}
           </tbody>

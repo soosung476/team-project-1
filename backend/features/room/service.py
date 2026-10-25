@@ -18,6 +18,7 @@ def get_room_reservations(db: Session, room_id: int, target_date: date):
     query = (
         select(
             Reservation.id,
+            Reservation.user_id,
             Reservation.title,
             Reservation.start_at,
             Reservation.end_at,

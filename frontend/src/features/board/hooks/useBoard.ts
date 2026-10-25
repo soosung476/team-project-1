@@ -4,12 +4,13 @@ import type { BoardResponse } from "../types/board";
 
 export const initialBoard: BoardResponse = {
   id: 0,
+  author_id: 0,
   title: "",
-  contents: "",
-  user_id: 0,
+  content: "",
+  view_count: 0,
   created_at: "",
-  views: 0,
-  user: { user_id: 0, name: "" },
+  updated_at: "",
+  author: { id: 0, name: "" },
   comments: [],
 };
 
