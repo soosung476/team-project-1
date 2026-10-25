@@ -11,6 +11,7 @@ import SignupPage from "./features/user/pages/SignupPage";
 import RoomReservation from "./features/room/pages/RoomReservation";
 import AdminUserPage from "./features/admin/pages/AdminUserPage";
 import NoticeList from "./features/notice/pages/NoticeList";
+import DepartmentPage from "./features/department/pages/DepartmentPage";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="signin" element={<LoginPage />} />
             <Route path="signup" element={<SignupPage />} />
           </Route>
+          <Route path="/department" element={<DepartmentPage/>}/>
           <Route path="/admin/users" element={<AdminUserPage />} />
         </Route>
       </Routes>
