@@ -54,7 +54,7 @@ const ApprovalTable = ({ items }: { items: ApprovalListItem[] }) => {
                     {item.drafter.id === user?.id &&
                       item.status === "REJECTED" && (
                         <span className="rounded-full  px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50">
-                          재작성가능
+                          재작성 가능
                         </span>
                       )}
                   </Link>

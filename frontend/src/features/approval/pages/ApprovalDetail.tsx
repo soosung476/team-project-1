@@ -109,7 +109,10 @@ const ApprovalDetail = () => {
 
           <div className="flex gap-2">
             {items.status === "REJECTED" && items.drafter.id === user?.id && (
-              <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50">
+              <button
+                onClick={() => navigate(`/approvals/write?from=${items.id}`)}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+              >
                 재작성
               </button>
             )}
