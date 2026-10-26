@@ -9,9 +9,9 @@ export type NoticeCreate = {
   is_pinned: "Y" | "N";
 };
 export type NoticeUpdate = {
-  title?: string;
-  content?: string;
-  is_pinned?: "Y" | "N";
+  title: string;
+  content: string;
+  is_pinned: "Y" | "N";
 };
 export type NoticeResponse = {
   id: number;
