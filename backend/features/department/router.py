@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from features.department.schema import DepartmentResponse,DepartmentCreate,DepartmentUpdate
 from features.department import service
-from features.department.exceptions import DepartmentExistingException,DepartmentNotFoundException
+from features.department.exceptions import DepartmentExistingException,DepartmentNotFoundException,DepartmentHasUsersException
 from core.dependencies import get_current_user
+
 
 router = APIRouter(prefix="/department", tags=["departments"], dependencies=[Depends(get_current_user)])
 
@@ -60,5 +61,10 @@ def delete_Department(department_id:int, db:Session=Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="해당 부서를 찾을 수 없습니다."
+        )
+    except DepartmentHasUsersException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="소속되 사원이 있는 부서는 삭제 할 수 없습니다."
         )
     

@@ -5,6 +5,7 @@ import {
      CreateDepartment,DeleteDepartment,
      UpdateDepartment 
     } from "../apis/departmentApi";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -12,6 +13,10 @@ export default function DepartmentPage() {
 
     const [departments, setDepartments] = useState<DepartmentResponse[]>([]);
     const [newName, setNewName] = useState("");
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editName, setEditName] = useState("");
+
+    const navigate = useNavigate();
 
     const fetchDepartments = async () => {
         const data = await getDepartments();
@@ -29,20 +34,22 @@ export default function DepartmentPage() {
     };
 
     const handleDelete = async (id : number) => {
-        await DeleteDepartment(id);
-        setDepartments(departments.filter((department)=> department.id !== id));
+        try {
+            await DeleteDepartment(id);
+            setDepartments(departments.filter((department)=> department.id !== id));            
+        }catch (error) {
+            alert("소속된 사원이 있는 부서는 삭제 할 수 없습니다.")
+        }
     };
     
     const handleUpdate = async (id: number)=>{
-        const editName = prompt(
-            "새 부서 이름을 입력 하세요."
-        );
         if (!editName) return;
         await UpdateDepartment(
             id, {
                 name: editName
             });
-            fetchDepartments();
+        setEditingId(null);
+        fetchDepartments();
     };
 
     return (
@@ -50,9 +57,17 @@ export default function DepartmentPage() {
             {/* 상단 타이틀 헤더 영역 */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                        부서 관리
-                    </h1>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                            부서 관리
+                        </h1>
+                        <button
+                            onClick={() => navigate("/admin/users")}
+                            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-xs transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+                        >
+                            사용자관리
+                        </button>
+                    </div>
                     <p className="mt-1 text-sm text-slate-500">
                         사내 부서 목록을 조회하고 새로운 부서를 등록·수정·삭제할 수 있습니다.
                     </p>
@@ -104,14 +119,42 @@ export default function DepartmentPage() {
                                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-600">
                                         {department.id}
                                     </span>
-                                    <span className="text-base font-medium text-slate-800">
-                                        {department.name}
-                                    </span>
+                                    <div>
+                                        <span className="text-base font-medium text-slate-800">
+                                            {department.name}
+                                        </span>
+
+                                        {editingId === department.id && (
+                                            <div className="mt-2 flex items-center gap-2">
+                                                <input
+                                                    value={editName}
+                                                    onChange={(e) => setEditName(e.target.value)}
+                                                    placeholder="새 부서 이름 입력"
+                                                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                                />
+                                                <button
+                                                    onClick={() => handleUpdate(department.id)}
+                                                    className="cursor-pointer rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-700"
+                                                >
+                                                    저장
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingId(null)}
+                                                    className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-100"
+                                                >
+                                                    취소
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center gap-2">
                                     <button
-                                        onClick={() => handleUpdate(department.id)}
+                                        onClick={() => {
+                                            setEditingId(department.id);
+                                            setEditName(department.name);
+                                        }}
                                         className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
                                     >
                                         수정
