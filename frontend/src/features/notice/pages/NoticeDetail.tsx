@@ -39,7 +39,7 @@ const NoticeDetail = () => {
 
           <div className="mt-4 flex items-center gap-4 text-sm text-slate-400">
             <span className="font-medium text-slate-600">{data.author.name}</span>
-            <span>{data.created_at}</span>
+            <span>{data.created_at.slice(0, 10)}</span>
           </div>
         </div>
 
