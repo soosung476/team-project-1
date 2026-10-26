@@ -1,20 +1,16 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field
-
-
-class ORMBase(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+from pydantic import BaseModel, Field
 
 
 # 기안자·결재자를 보여줄 때 쓰는 짧은 사용자 정보
-class UserBrief(ORMBase):
+class UserBrief(BaseModel):
     id: int
     name: str
     position: str
 
 
 # 목록 한 줄 (본문 content는 빼고 보냄)
-class ApprovalListItem(ORMBase):
+class ApprovalListItem(BaseModel):
     id: int
     title: str
     status: str
@@ -25,7 +21,7 @@ class ApprovalListItem(ORMBase):
 
 
 # 문서 하나 자세히 보기
-class ApprovalResponse(ORMBase):
+class ApprovalResponse(BaseModel):
     id: int
     title: str
     content: str
@@ -46,3 +42,11 @@ class ApprovalCreate(BaseModel):
 # 승인·반려: status에 "APPROVED" 또는 "REJECTED"
 class ApprovalStatusUpdate(BaseModel):
     status: str
+
+
+class ApprovalPageResponse(BaseModel):
+    items: list[ApprovalListItem]
+    total: int
+    page: int
+    size: int
+    total_pages: int
