@@ -28,3 +28,11 @@ export type ApprovalListItem = {
 export type ApprovalResponse = ApprovalListItem & {
   content: string;
 };
+
+export type ApprovalPageResponse = {
+  items: ApprovalListItem[];
+  total: number;
+  page: number;
+  size: number;
+  total_pages: number;
+};
