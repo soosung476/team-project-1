@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 
 from db.database import get_db
 from features.room.models import MeetingRoom
-from features.room.schema import MeetingRoomResponse, ReservationResponse, RoomSlotResponse, ReservationCreate, ReservationDetailResponse
-from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation, get_reservations, cancel_reservation
-from core.dependencies import get_current_user
+from features.room.schema import MeetingRoomResponse, ReservationResponse, RoomSlotResponse, ReservationCreate, ReservationDetailResponse, AdminReservationPageResponse
+from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation, get_reservations, cancel_reservation, get_admin_reservations, admin_cancel_reservation
+from core.dependencies import get_current_user, get_admin_user
 from features.user.models import User
 from typing import Literal
 
@@ -70,3 +70,23 @@ def delete_reservation(
     user: User = Depends(get_current_user),
 ):
     return cancel_reservation(db, user, reservation_id)
+
+
+admin_reserv_router = APIRouter(
+    prefix="/admin/reservations",
+    tags=["admin-reservations"],
+    dependencies=[Depends(get_admin_user)],
+)
+
+#--------------------
+# 관리자용
+
+# 전체 예약 페이징 조회
+@admin_reserv_router.get("", response_model=AdminReservationPageResponse)
+def list_admin_reservations(page: int = 1, size: int = 10, db: Session = Depends(get_db)):
+    return get_admin_reservations(db, page, size)
+
+# 관리자 예약 취소
+@admin_reserv_router.delete("/{reservation_id}")
+def admin_delete_reservation(reservation_id: int, db: Session = Depends(get_db)):
+    return admin_cancel_reservation(db, reservation_id)

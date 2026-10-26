@@ -1,10 +1,11 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from datetime import date, datetime, time, timedelta # timedelta: 두 시간 사이 간격
 from sqlalchemy.orm import Session
 from features.room.models import MeetingRoom, Reservation
 from features.room.schema import ReservationCreate
 from features.user.models import User
 from fastapi import HTTPException
+import math
 
 def get_meeting_rooms(db: Session):
     query = select(MeetingRoom).where(MeetingRoom.is_active == 'Y').order_by(MeetingRoom.id)
@@ -186,6 +187,70 @@ def cancel_reservation(db: Session, user: User, reservation_id: int):
     # 권한 없으면 오류 403
     if not can_manage_reservation(user, reservation):
         raise HTTPException(status_code=403, detail={"code": "FORBIDDEN", "message": "본인 예약만 취소할 수 있습니다."})
+
+    # 삭제
+    deleted_id = reservation.id
+    db.delete(reservation)
+    db.commit()
+
+    return {"id": deleted_id, "message": "예약이 취소되었습니다."}
+
+
+
+# -------------------
+# 관리자용
+# 전체 예약 페이징 조회
+def get_admin_reservations(db: Session, page: int, size: int):
+
+    # 몇 개 건너뛸지 계산 (offset)
+    # 전체 예약 수 세기 (total)
+    # 전체 페이지 수 계산 (total_pages)
+    # 이번 페이지 분량만 조회 (items)
+    # 5개 값을 dict로 반환 → AdminReservationPageResponse 모양
+
+    offset = (page - 1) * size
+    total = db.scalar(select(func.count()).select_from(Reservation))
+    total_pages = math.ceil(total / size)
+
+    query = (
+        select(
+            Reservation.id,
+            Reservation.user_id,
+            Reservation.room_id,
+            MeetingRoom.name.label("room_name"),
+            Reservation.title,
+            Reservation.start_at,
+            Reservation.end_at,
+            User.name.label("user_name"),
+            User.position.label("user_position"),
+            Reservation.created_at,
+        )
+        .join(MeetingRoom, MeetingRoom.id == Reservation.room_id) # 회의실 이름
+        .join(User, Reservation.user_id == User.id) # 예약자 이름·직급
+        .order_by(Reservation.start_at.desc()) # 시작시간 늦은 순
+        .offset(offset) # 앞에서 offset개 건너뛰기
+        .limit(size) # size개만 가져오기
+    )
+    items = db.execute(query).mappings().all()
+
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "size": size,
+        "total_pages": total_pages,
+    }
+
+
+
+# 관리자 예약 취소
+def admin_cancel_reservation(db: Session, reservation_id: int):
+    # 예약 꺼내기
+    reservation = db.get(Reservation, reservation_id)
+
+    # 예약 없으면 오류 404
+    if reservation is None:
+        raise HTTPException(status_code=404, detail={"code": "RESERVATION_NOT_FOUND", "message": "예약을 찾을 수 없습니다."})
 
     # 삭제
     deleted_id = reservation.id

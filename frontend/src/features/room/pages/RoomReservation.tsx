@@ -4,21 +4,12 @@ import type {
   RoomSlotResponse,
 } from "../types/room";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { getRoomReservations, getRooms, getRoomSlots, postReservation } from "../apis/roomApi";
-import {useAuth} from "../../user/context/AuthContext";
+import { useAuth } from "../../user/context/AuthContext";
 import MyReservations from "../components/MyReservations";
-
-const getToday = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-};
-
-// 숫자를 두 자리로: 9 → 09
-const pad = (n: number) => String(n).padStart(2, "0");
-
-// "2026-11-20T09:30:00" → "09:30"
-const toHHMM = (iso: string) => iso.slice(11, 16);
+import { getToday, toHHMM } from "../utils/time";
+import { getErrorMessage, getErrorStatus } from "../utils/error";
+import { card, cardHeader, tabStyle } from "../style";
 
 const RoomReservation = () => {
   const { user } = useAuth();
@@ -66,7 +57,7 @@ const RoomReservation = () => {
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
   const startAt = selectedSlots[0];                         
-  const lastSlot = slots.find((s) => s.start_at === selectedSlots[selectedSlots.length-1] );     // 빈칸: selectedSlots의 마지막 값
+  const lastSlot = slots.find((s) => s.start_at === selectedSlots[selectedSlots.length-1] );     // 선택한 마지막 칸 (끝 시간 구할려고)
   const endAt = lastSlot?.end_at;
 
   // 예약 버튼을 누를 수 있는 상태인지
@@ -98,41 +89,17 @@ const RoomReservation = () => {
       setTitle("");
       refresh(selectedRoomId);
     } catch (err) {
-      // 백엔드 detail = { code, message } 모양이면 그 message 를 보여줌
-      if (axios.isAxiosError(err)) {
-        const detail = err.response?.data?.detail;
-        const status = err.response?.status;
-        if (detail && typeof detail === "object" && "message" in detail) {
-          setMessage(detail.message);
-        } else if (status === 422) {
-          setMessage("입력값을 확인해 주세요.");
-        } else {
-          setMessage("예약 중 오류가 발생했습니다.");
-        }
-        // 409: 그사이 다른 사람이 먼저 예약함 → 선택 비우고 최신 상태로
-        if (status === 409) {
-          setSelectedSlots([]);
-          refresh(selectedRoomId);
-        }
-      } else {
-        setMessage("예약 중 오류가 발생했습니다.");
+      // 에러 문구는 utils/error 에서 꺼냄
+      setMessage(getErrorMessage(err, "예약 중 오류가 발생했습니다."));
+      // 409: 그사이 다른 사람이 먼저 예약함 → 선택 비우고 최신 상태로
+      if (getErrorStatus(err) === 409) {
+        setSelectedSlots([]);
+        refresh(selectedRoomId);
       }
     } finally {
       setSubmitting(false);
     }
   };
-
-  // 카드 박스 공통 스타일 (팀 디자인 확정 시 여기만 바꾸면 됨)
-  const card = "overflow-hidden rounded-xl border border-slate-200 bg-white";
-  const cardHeader =
-    "flex shrink-0 items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-3";
-  // 탭 버튼 스타일 회의실 칩이랑 똑같이
-  const tabStyle = (active: boolean) =>
-    `rounded-lg border px-3 py-1.5 text-sm font-medium transition ${
-      active
-        ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-    }`;
 
   return (
     // 페이지 높이를 "화면 높이 - (헤더 + 메뉴 + 푸터 + 위아래 여백)" 으로 고정
@@ -228,7 +195,7 @@ const RoomReservation = () => {
             </div>
 
             {/* 시간 목록 */}
-            <div className="border-l-4 border-l-transparent min-h-0 flex-1 overflow-y-auto">
+            <div className="min-h-0 flex-1 overflow-y-auto">
               {slots.map((slot) => {
                 const reservation = findReservation(slot);
                 const isSelected = selectedSlots.includes(slot.start_at);
@@ -261,7 +228,7 @@ const RoomReservation = () => {
                         }
                       }
                     }
-                    className={`flex h-10 items-center gap-3 border-b border-slate-100 px-4 text-sm ${rowStyle}`}
+                    className={`flex h-10 items-center gap-3 border-b border-l-4 border-slate-100 border-l-transparent px-4 text-sm ${rowStyle}`}
                   >
                     <input
                       type="checkbox"

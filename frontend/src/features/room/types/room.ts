@@ -41,3 +41,13 @@ export type ReservationDetailResponse = {
     user_position: string | null;
     created_at: string;
 }
+
+// -------------------
+// 관리자용
+export type AdminReservationPageResponse = {
+    items: ReservationDetailResponse[];
+    total: number;
+    page: number;
+    size: number;
+    total_pages: number;
+};

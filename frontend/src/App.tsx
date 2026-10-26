@@ -9,6 +9,7 @@ import BoardWrite from "./features/board/pages/BoardWrite";
 import LoginPage from "./features/user/pages/LoginPage";
 import SignupPage from "./features/user/pages/SignupPage";
 import RoomReservation from "./features/room/pages/RoomReservation";
+import AdminRoomPage from "./features/room/pages/AdminRoomPage";
 import AdminUserPage from "./features/admin/pages/AdminUserPage";
 import NoticeList from "./features/notice/pages/NoticeList";
 import DepartmentPage from "./features/department/pages/DepartmentPage";
@@ -53,6 +54,7 @@ function App() {
           </Route>
           <Route path="/department" element={<DepartmentPage/>}/>
           <Route path="/admin/users" element={<AdminUserPage />} />
+          <Route path="/admin/rooms" element={<AdminRoomPage />} />
         </Route>
       </Routes>
     </>
