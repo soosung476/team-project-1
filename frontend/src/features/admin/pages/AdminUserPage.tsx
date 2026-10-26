@@ -11,11 +11,12 @@ import Pagination from "../../../common/components/Pagination";
 // 한 페이지에 보여줄 사용자 수
 // 컴포넌트 밖에 두면 바뀌지 않는 값이라 useEffect 의존성에 넣지 않아도 됨
 const size = 10;
+import { useNavigate } from "react-router-dom";
 
 const AdminUserPage = () => {
   const [users, setUsers] = useState<AdminUserResponse[]>([]);
   const [departments, setDepartments] = useState<DepartmentResponse[]>([]);
-
+  
   const { user, loading } = useAuth();
 
   // 페이지네이션
@@ -31,6 +32,8 @@ const AdminUserPage = () => {
   const pageSize = 5;
   const startPage = Math.floor((page - 1) / pageSize) * pageSize + 1;
   const endPage = Math.min(startPage + pageSize - 1, totalPages);
+  const navigate = useNavigate();
+  // TODO: useEffect에서 getUsers(), getDepartments()로 위 state 채우기
 
   // 사용자 목록: 페이지나 검색어가 바뀌면 다시 불러옴
   useEffect(() => {
@@ -108,6 +111,17 @@ const AdminUserPage = () => {
             검색
           </button>
         </form>
+      <div className="mb-4 flex items-center gap-4">
+      <h1 className="mb-4 text-2xl font-bold tracking-tight">사용자 관리</h1>
+      <button onClick={()=>navigate("/department")}
+        className="cursor-pointer rounded-lg border
+        border-slate-200 bg-white px-3 py-1.5
+        text-xs font-semibold text-slate-600 shadow-xs
+        transition
+        hover:border-indigo-200 hover:bg-indigo-50
+        hover:text-indigo-600">
+        부서 관리 
+      </button>
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">

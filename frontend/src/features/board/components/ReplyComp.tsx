@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../user/context/AuthContext";
 import type { CommentResponse } from "../types/board";
 export type ReplyProps = {
   comment: CommentResponse[];
@@ -8,6 +9,10 @@ export type ReplyProps = {
 };
 
 const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCommentEdit }: ReplyProps) => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const canManage = (authorId: number) => user?.id === authorId || isAdmin;
+
   const [commentContent, setCommentContent] = useState("");
   const handleCommentSubmitWrapper = () => {
     handleCommentSubmit(commentContent);
@@ -63,7 +68,7 @@ const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCo
                 </div>
 
                 {/* 댓글 수정/삭제 버튼 */}
-                {editingCommentId !== comment.id && (
+                {editingCommentId !== comment.id && canManage(comment.author_id) && (
                   <div className="flex items-center gap-3 text-xs">
                     <button onClick={() => handleEditStart(comment)} className="text-slate-400 hover:text-indigo-600">
                       수정

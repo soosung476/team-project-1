@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from features.department.models import Department
 from features.department.schema import DepartmentCreate, DepartmentResponse, DepartmentUpdate
-from features.department.exceptions import DepartmentExistingException, DepartmentNotFoundException
+from features.department.exceptions import DepartmentExistingException, DepartmentNotFoundException, DepartmentHasUsersException
 from sqlalchemy import select, func
 
 def get_departments(db: Session):
@@ -59,5 +59,7 @@ def delete_department(db: Session, department_id: int):
     department = db.get(Department, department_id)
     if department is None:
         raise DepartmentNotFoundException
+    if department.users:
+        raise DepartmentHasUsersException
     db.delete(department)
     db.commit()
