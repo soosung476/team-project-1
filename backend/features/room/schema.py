@@ -52,3 +52,12 @@ class ReservationDetailResponse(BaseModel):
     user_name: str
     user_position: str | None
     created_at: datetime
+
+# -------------------
+# 관리자용 클래스 추가
+class AdminReservationPageResponse(BaseModel):
+    items: list[ReservationDetailResponse]
+    total: int
+    page: int
+    size: int
+    total_pages: int
