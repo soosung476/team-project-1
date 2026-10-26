@@ -8,11 +8,12 @@ import axios from "axios";
 import { useAuth } from "../../user/context/AuthContext";
 import Pagination from "../../../common/components/Pagination";
 import { useNavigate } from "react-router-dom";
+
 // 한 페이지에 보여줄 사용자 수
 // 컴포넌트 밖에 두면 바뀌지 않는 값이라 useEffect 의존성에 넣지 않아도 됨
+const size = 10;
 
 const AdminUserPage = () => {
-  const size = 10;
   const [users, setUsers] = useState<AdminUserResponse[]>([]);
   const [departments, setDepartments] = useState<DepartmentResponse[]>([]);
 
@@ -89,8 +90,17 @@ const AdminUserPage = () => {
 
   return (
     <div>
-      <div className="mb-4 flex items-end justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">사용자 관리</h1>
+      {/* 머리: 왼쪽 제목·부서 관리 버튼 / 오른쪽 검색 */}
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold tracking-tight">사용자 관리</h1>
+          <button
+            onClick={() => navigate("/department")}
+            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-xs transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+          >
+            부서 관리
+          </button>
+        </div>
 
         <form
           onSubmit={handleSearch}
@@ -110,76 +120,60 @@ const AdminUserPage = () => {
             검색
           </button>
         </form>
-        <div className="mb-4 flex items-center gap-4">
-          <h1 className="mb-4 text-2xl font-bold tracking-tight">
-            사용자 관리
-          </h1>
-          <button
-            onClick={() => navigate("/department")}
-            className="cursor-pointer rounded-lg border
-        border-slate-200 bg-white px-3 py-1.5
-        text-xs font-semibold text-slate-600 shadow-xs
-        transition
-        hover:border-indigo-200 hover:bg-indigo-50
-        hover:text-indigo-600"
-          >
-            부서 관리
-          </button>
-        </div>
-
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <table className="w-full whitespace-nowrap text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
-              <tr>
-                <th className="px-4 py-2.5 text-left font-medium text-slate-500">
-                  이름
-                </th>
-                <th className="w-full px-4 py-2.5 text-left font-medium text-slate-500">
-                  이메일
-                </th>
-                <th className="px-4 py-2.5 text-center font-medium text-slate-500">
-                  부서
-                </th>
-                <th className="px-4 py-2.5 text-center font-medium text-slate-500">
-                  직급
-                </th>
-                <th className="px-4 py-2.5 text-center font-medium text-slate-500">
-                  권한
-                </th>
-                <th className="px-4 py-2.5"></th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-slate-100">
-              {users.map((user) => (
-                <AdminUserRow
-                  key={user.id}
-                  user={user}
-                  departments={departments}
-                />
-              ))}
-              {keyword && users.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-10 text-center text-slate-400"
-                  >
-                    검색 결과가 없습니다.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          start={startPage}
-          end={endPage}
-        />
       </div>
+
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+        <table className="w-full whitespace-nowrap text-sm">
+          <thead className="border-b border-slate-200 bg-slate-50">
+            <tr>
+              <th className="px-4 py-2.5 text-left font-medium text-slate-500">
+                이름
+              </th>
+              <th className="w-full px-4 py-2.5 text-left font-medium text-slate-500">
+                이메일
+              </th>
+              <th className="px-4 py-2.5 text-center font-medium text-slate-500">
+                부서
+              </th>
+              <th className="px-4 py-2.5 text-center font-medium text-slate-500">
+                직급
+              </th>
+              <th className="px-4 py-2.5 text-center font-medium text-slate-500">
+                권한
+              </th>
+              <th className="px-4 py-2.5"></th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-slate-100">
+            {users.map((user) => (
+              <AdminUserRow
+                key={user.id}
+                user={user}
+                departments={departments}
+              />
+            ))}
+            {keyword && users.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-4 py-10 text-center text-slate-400"
+                >
+                  검색 결과가 없습니다.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        start={startPage}
+        end={endPage}
+      />
     </div>
   );
 };
