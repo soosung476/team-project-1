@@ -100,6 +100,12 @@ const AdminUserPage = () => {
           >
             부서 관리
           </button>
+          <button
+            onClick={() => navigate("/admin/rooms")}
+            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-xs transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
+          >
+            회의실 관리
+          </button>
         </div>
 
         <form
