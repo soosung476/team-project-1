@@ -47,3 +47,9 @@ export const getMyReservations = async (scope: "mine" | "all" = "mine") => {
   });
   return response.data;
 };
+
+// 예약 취소
+export const deleteReservation = async (id: number) => {
+  const response = await axiosInstance.delete(`/reservations/${id}`);
+  return response.data;
+};
