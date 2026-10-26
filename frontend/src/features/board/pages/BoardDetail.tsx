@@ -82,6 +82,10 @@ const BoardDetail = () => {
   if (loading) {
     return <p>Loading....</p>;
   }
+
+  const isAdmin = user?.role === "admin";
+  const canManage = user?.id === board.author_id || isAdmin;
+
   return (
     <div>
       <div className="mb-3 text-sm text-slate-400">
@@ -116,32 +120,32 @@ const BoardDetail = () => {
             목록
           </Link>
 
-          <div className="flex gap-2">
-            <button
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
-              disabled={user?.id !== board.author_id}
-              onClick={() =>
-                navigate({
-                  pathname: `/boards/${id}/edit`,
-                  search: `?page=${currentPage}&size=${size}`,
-                })
-              }
-            >
-              수정
-            </button>
-
-            <button
-              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
-              disabled={user?.id !== board.author_id}
-              onClick={() => {
-                if (confirm("정말로 삭제하시겠습니까?")) {
-                  deleteClick(id);
+          {canManage && (
+            <div className="flex gap-2">
+              <button
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+                onClick={() =>
+                  navigate({
+                    pathname: `/boards/${id}/edit`,
+                    search: `?page=${currentPage}&size=${size}`,
+                  })
                 }
-              }}
-            >
-              삭제
-            </button>
-          </div>
+              >
+                수정
+              </button>
+
+              <button
+                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
+                onClick={() => {
+                  if (confirm("정말로 삭제하시겠습니까?")) {
+                    deleteClick(id);
+                  }
+                }}
+              >
+                삭제
+              </button>
+            </div>
+          )}
         </div>
       </article>
       {/* 댓글 보여주기 posts/${id}/cmments */}
