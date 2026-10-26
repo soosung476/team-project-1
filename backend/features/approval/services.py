@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import Session, selectinload
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
+import math
 from core.positions import POSITION_LEVEL
 from features.approval.models import ApprovalDocument
 from features.approval.schema import ApprovalCreate, ApprovalStatusUpdate
@@ -15,86 +16,144 @@ from features.approval.exceptions import (
 )
 
 
-# 결재 대기: 내가 결재자이고 아직 처리 안 한 문서
-def get_pending_list(db: Session, user: User):
+def get_approval_page(
+    db: Session, conditions, order, page: int, size: int, criteria: str, keyword: str
+):
+
+    if keyword:
+        if criteria == "title":
+            conditions.append(ApprovalDocument.title.contains(keyword))
+        elif criteria == "drafter":
+            conditions.append(ApprovalDocument.drafter.has(User.name.contains(keyword)))
+        elif criteria == "approver":
+            conditions.append(
+                ApprovalDocument.approver.has(User.name.contains(keyword))
+            )
+
+    offset = (page - 1) * size
+    total = db.scalar(
+        select(func.count()).select_from(ApprovalDocument).where(*conditions)
+    )
+    total_pages = math.ceil(total / size)
     stmt = (
         select(ApprovalDocument)
         .options(
             selectinload(ApprovalDocument.drafter),
             selectinload(ApprovalDocument.approver),
         )
-        .where(
-            ApprovalDocument.approver_id == user.id,
-            ApprovalDocument.status == "IN_PROGRESS",
-        )
-        .order_by(ApprovalDocument.id.desc())
+        .where(*conditions)
+        .order_by(*order)
+        .offset(offset)
+        .limit(size)
     )
-    pending_list = db.scalars(stmt).all()
+    total_list = db.scalars(stmt).all()
+    return {
+        "items": total_list,
+        "page": page,
+        "total": total,
+        "size": size,
+        "total_pages": total_pages,
+    }
 
-    return pending_list
+
+# 결재 대기: 내가 결재자이고 아직 처리 안 한 문서
+def get_pending_list(
+    db: Session, user: User, page: int, size: int, criteria: str, keyword: str
+):
+    conditions = [
+        ApprovalDocument.approver_id == user.id,
+        ApprovalDocument.status == "IN_PROGRESS",
+    ]
+    order = [ApprovalDocument.id.desc()]
+
+    result_page = get_approval_page(
+        db=db,
+        page=page,
+        size=size,
+        criteria=criteria,
+        keyword=keyword,
+        conditions=conditions,
+        order=order,
+    )
+    return result_page
 
 
 # 내 기안: 내가 올렸고 아직 처리 안 된 문서
-def get_my_drafted_list(db: Session, user: User):
-    stmt = (
-        select(ApprovalDocument)
-        .options(
-            selectinload(ApprovalDocument.drafter),
-            selectinload(ApprovalDocument.approver),
-        )
-        .where(
-            ApprovalDocument.drafter_id == user.id,
-            ApprovalDocument.status == "IN_PROGRESS",
-        )
-        .order_by(ApprovalDocument.id.desc())
+def get_my_drafted_list(
+    db: Session, user: User, page: int, size: int, criteria: str, keyword: str
+):
+
+    conditions = [
+        ApprovalDocument.drafter_id == user.id,
+        ApprovalDocument.status == "IN_PROGRESS",
+    ]
+    order = [ApprovalDocument.id.desc()]
+
+    result_page = get_approval_page(
+        db=db,
+        page=page,
+        size=size,
+        criteria=criteria,
+        keyword=keyword,
+        conditions=conditions,
+        order=order,
     )
-    my_drafted_list = db.scalars(stmt).all()
-    return my_drafted_list
+
+    return result_page
 
 
 # 승인됨: 내가 기안자이거나 결재자인 문서 중 승인된 것
-def get_approval_list(db: Session, user: User):
-    stmt = (
-        select(ApprovalDocument)
-        .options(
-            selectinload(ApprovalDocument.drafter),
-            selectinload(ApprovalDocument.approver),
-        )
-        .where(
-            or_(
-                ApprovalDocument.drafter_id == user.id,
-                ApprovalDocument.approver_id == user.id,
-            ),
-            ApprovalDocument.status == "APPROVED",
-        )
-        .order_by(ApprovalDocument.completed_at.desc())
+def get_approval_list(
+    db: Session, user: User, page: int, size: int, criteria: str, keyword: str
+):
+
+    conditions = [
+        or_(
+            ApprovalDocument.drafter_id == user.id,
+            ApprovalDocument.approver_id == user.id,
+        ),
+        ApprovalDocument.status == "APPROVED",
+    ]
+
+    order = [ApprovalDocument.completed_at.desc(), ApprovalDocument.id.desc()]
+    result_page = get_approval_page(
+        db=db,
+        page=page,
+        size=size,
+        criteria=criteria,
+        keyword=keyword,
+        conditions=conditions,
+        order=order,
     )
 
-    approval_list = db.scalars(stmt).all()
-    return approval_list
+    return result_page
 
 
 # 반려됨: 내가 기안자이거나 결재자인 문서 중 반려된 것
-def get_rejected_list(db: Session, user: User):
-    stmt = (
-        select(ApprovalDocument)
-        .options(
-            selectinload(ApprovalDocument.drafter),
-            selectinload(ApprovalDocument.approver),
-        )
-        .where(
-            or_(
-                ApprovalDocument.drafter_id == user.id,
-                ApprovalDocument.approver_id == user.id,
-            ),
-            # 파이썬의 and가 아니라 쉼표(,)로 이어야 SQL의 AND가 됩니다.
-            ApprovalDocument.status == "REJECTED",
-        )
-        .order_by(ApprovalDocument.completed_at.desc())
-    )
+def get_rejected_list(
+    db: Session, user: User, page: int, size: int, criteria: str, keyword: str
+):
 
-    rejected_list = db.scalars(stmt).all()
-    return rejected_list
+    conditions = [
+        or_(
+            ApprovalDocument.drafter_id == user.id,
+            ApprovalDocument.approver_id == user.id,
+        ),
+        ApprovalDocument.status == "REJECTED",
+    ]
+
+    order = [ApprovalDocument.completed_at.desc(), ApprovalDocument.id.desc()]
+
+    result_page = get_approval_page(
+        db=db,
+        page=page,
+        size=size,
+        criteria=criteria,
+        keyword=keyword,
+        conditions=conditions,
+        order=order,
+    )
+    return result_page
 
 
 # ---------- 결재자 후보 ----------

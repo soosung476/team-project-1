@@ -3,20 +3,18 @@ import type { ApprovalCreate, ApprovalStatusUpdate } from "../types/approval";
 
 const SERVER_URL = "http://localhost:8000/approvals";
 
-export const getPending = async () => {
-  const response = await axiosInstance.get(`${SERVER_URL}/pending`);
-  return response.data;
-};
-export const getDrafted = async () => {
-  const response = await axiosInstance.get(`${SERVER_URL}/drafted`);
-  return response.data;
-};
-export const getApproved = async () => {
-  const response = await axiosInstance.get(`${SERVER_URL}/approved`);
-  return response.data;
-};
-export const getRejected = async () => {
-  const response = await axiosInstance.get(`${SERVER_URL}/rejected`);
+// listType = pending, drafted, approved, rejected, 중 하나
+
+export const getApprovalList = async (
+  listType: string,
+  page: number,
+  size: number,
+  criteria: string,
+  keyword: string,
+) => {
+  const response = await axiosInstance.get(`${SERVER_URL}/${listType}`, {
+    params: { page: page, size: size, criteria: criteria, keyword: keyword },
+  });
   return response.data;
 };
 

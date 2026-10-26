@@ -3,8 +3,10 @@ import type { AdminUserUpdate } from "../types/admin";
 
 const SERVER_URL = "http://localhost:8000/admin";
 
-export const getUsers = async () => {
-  const response = await axiosInstance.get(`${SERVER_URL}/users`);
+export const getUsers = async (page: number, size: number, keyword: string) => {
+  const response = await axiosInstance.get(`${SERVER_URL}/users`, {
+    params: { page, size, keyword },
+  });
   return response.data;
 };
 

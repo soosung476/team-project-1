@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useNotices from "../../notice/hooks/useNotices";
-import type { ApprovalListItem } from "../../approval/types/approval";
-import { getDrafted, getPending } from "../../approval/apis/approvalApi";
+import type { ApprovalPageResponse } from "../../approval/types/approval";
+import { getApprovalList } from "../../approval/apis/approvalApi";
+import { initialApprovals } from "../../approval/hooks/useApprovals";
 import { useAuth } from "../../user/context/AuthContext";
 
 // 오늘 날짜를 "2026년 10월 23일 금요일" 모양으로 만들기
@@ -20,8 +21,9 @@ const Home = () => {
   // 필독(is_pinned === "Y")만 남기기
   const pinnedNotices = notices.items.filter((notice) => notice.is_pinned === "Y");
 
-  const [pending, setPending] = useState<ApprovalListItem[]>([]);
-  const [drafted, setDrafted] = useState<ApprovalListItem[]>([]);
+  // 결재 목록 응답은 { items, total, page, size, total_pages } 모양
+  const [pending, setPending] = useState<ApprovalPageResponse>(initialApprovals);
+  const [drafted, setDrafted] = useState<ApprovalPageResponse>(initialApprovals);
   const { isLoggedIn, user } = useAuth();
 
   // 결재 목록은 로그인했을 때만 요청
@@ -32,17 +34,16 @@ const Home = () => {
     }
     const fetchData = async () => {
       try {
-        setPending(await getPending());
-        setDrafted(await getDrafted());
+        // 결재 대기: 위젯에 5개만 보여주므로 5개만 받음
+        setPending(await getApprovalList("pending", 1, 5, "title", ""));
+        // 내 기안: 개수(total)만 쓰므로 1개만 받음
+        setDrafted(await getApprovalList("drafted", 1, 1, "title", ""));
       } catch (error) {
         console.log(error);
       }
     };
     fetchData();
   }, [isLoggedIn]);
-
-  // 내 기안 중 아직 결재자가 처리 안 한 문서 개수
-  const draftedInProgress = drafted.filter((item) => item.status === "IN_PROGRESS").length;
 
   return (
     // 왼쪽 aside(고정 폭) + 오른쪽 위젯 영역을 한 줄에 나란히
@@ -69,11 +70,12 @@ const Home = () => {
               <div className="mt-3 divide-y divide-slate-100 border-t border-slate-100 text-sm">
                 <Link to="/approvals/inbox" className="flex justify-between py-2 hover:text-indigo-600">
                   <span className="text-slate-600">결재 대기</span>
-                  <span className="font-bold text-indigo-600">{pending.length}</span>
+                  <span className="font-bold text-indigo-600">{pending.total}</span>
                 </Link>
                 <Link to="/approvals" className="flex justify-between py-2 hover:text-indigo-600">
                   <span className="text-slate-600">내 기안 진행중</span>
-                  <span className="font-bold text-slate-700">{draftedInProgress}</span>
+                  {/* 내 기안 목록은 원래 처리 안 된(IN_PROGRESS) 문서만 오므로 total이 곧 진행중 개수 */}
+                  <span className="font-bold text-slate-700">{drafted.total}</span>
                 </Link>
               </div>
             </>
@@ -118,7 +120,7 @@ const Home = () => {
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               결재 대기
               {isLoggedIn && (
-                <span className="rounded-full bg-red-500 px-1.5 text-xs font-bold text-white">{pending.length}</span>
+                <span className="rounded-full bg-red-500 px-1.5 text-xs font-bold text-white">{pending.total}</span>
               )}
             </h2>
             <Link to="/approvals/inbox" className="text-xs text-slate-400 hover:text-indigo-600">
@@ -128,12 +130,12 @@ const Home = () => {
 
           {!isLoggedIn ? (
             <p className="px-4 py-10 text-center text-sm text-slate-400">로그인 후 확인할 수 있습니다.</p>
-          ) : pending.length === 0 ? (
+          ) : pending.items.length === 0 ? (
             <p className="px-4 py-10 text-center text-sm text-slate-400">결재할 문서가 없습니다. 👍</p>
           ) : (
             <div className="divide-y divide-slate-100">
-              {/* 홈에서는 5개만 보여주기 */}
-              {pending.slice(0, 5).map((item) => (
+              {/* 서버에서 5개만 받아 왔으므로 그대로 보여주기 */}
+              {pending.items.map((item) => (
                 <Link
                   key={item.id}
                   to={`/approvals/${item.id}`}

@@ -12,11 +12,11 @@ from features.approval.exceptions import (
     AlreadyCompletedException,
 )
 from features.approval.schema import (
-    ApprovalListItem,
     ApprovalResponse,
     ApprovalCreate,
     ApprovalStatusUpdate,
     UserBrief,
+    ApprovalPageResponse,
 )
 from features.approval.services import (
     get_approval_list,
@@ -49,32 +49,60 @@ approval_router = APIRouter(prefix="/approvals", tags=["approval"])
 # DELETE /approvals/{id}       -> 삭제 (기안자만, 처리 전 문서만)
 
 
-@approval_router.get("/pending", response_model=list[ApprovalListItem])
+@approval_router.get("/pending", response_model=ApprovalPageResponse)
 async def get_pending(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    page: int = 1,
+    size: int = 10,
+    criteria: str = "title",
+    keyword: str = "",
 ):
-    return get_pending_list(db=db, user=user)
+    return get_pending_list(
+        db=db, user=user, page=page, size=size, criteria=criteria, keyword=keyword
+    )
 
 
-@approval_router.get("/drafted", response_model=list[ApprovalListItem])
+@approval_router.get("/drafted", response_model=ApprovalPageResponse)
 async def get_my_drafted(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    page: int = 1,
+    size: int = 10,
+    criteria: str = "title",
+    keyword: str = "",
 ):
-    return get_my_drafted_list(db=db, user=user)
+    return get_my_drafted_list(
+        db=db, user=user, page=page, size=size, criteria=criteria, keyword=keyword
+    )
 
 
-@approval_router.get("/approved", response_model=list[ApprovalListItem])
+@approval_router.get("/approved", response_model=ApprovalPageResponse)
 async def get_approved(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    page: int = 1,
+    size: int = 10,
+    criteria: str = "title",
+    keyword: str = "",
 ):
-    return get_approval_list(db=db, user=user)
+    return get_approval_list(
+        db=db, user=user, page=page, size=size, criteria=criteria, keyword=keyword
+    )
 
 
-@approval_router.get("/rejected", response_model=list[ApprovalListItem])
+@approval_router.get("/rejected", response_model=ApprovalPageResponse)
 async def get_rejected(
-    db: Session = Depends(get_db), user: User = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    page: int = 1,
+    size: int = 10,
+    criteria: str = "title",
+    keyword: str = "",
 ):
-    return get_rejected_list(db=db, user=user)
+    return get_rejected_list(
+        db=db, user=user, page=page, size=size, criteria=criteria, keyword=keyword
+    )
 
 
 # 결재자 후보 (기안 화면의 결재자 select에 넣을 목록)

@@ -1,31 +1,37 @@
 import { useEffect, useState } from "react";
-import type { ApprovalListItem } from "../types/approval";
-import {
-  getApproved,
-  getDrafted,
-  getPending,
-  getRejected,
-} from "../apis/approvalApi";
+import { getApprovalList } from "../apis/approvalApi";
+import type { ApprovalPageResponse } from "../types/approval";
 
-const useApprovals = (listType: string) => {
-  const [items, setItems] = useState<ApprovalListItem[]>([]);
+export const initialApprovals: ApprovalPageResponse = {
+  items: [],
+  total: 0,
+  page: 1,
+  size: 10,
+  total_pages: 0,
+};
+const useApprovals = (
+  listType: string,
+  page: number,
+  size: number,
+  criteria: string,
+  keyword: string,
+) => {
+  const [data, setData] = useState<ApprovalPageResponse>(initialApprovals);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        let data: ApprovalListItem[] = [];
-        if (listType === "pending") {
-          data = await getPending();
-        } else if (listType === "drafted") {
-          data = await getDrafted();
-        } else if (listType === "approved") {
-          data = await getApproved();
-        } else if (listType === "rejected") {
-          data = await getRejected();
-        }
-        setItems(data);
+
+        const data = await getApprovalList(
+          listType,
+          page,
+          size,
+          criteria,
+          keyword,
+        );
+        setData(data);
       } catch (error) {
         console.log(error);
       } finally {
@@ -33,9 +39,9 @@ const useApprovals = (listType: string) => {
       }
     };
     fetchData();
-  }, [listType]);
+  }, [listType, page, criteria, size, keyword]);
 
-  return { items, loading };
+  return { data, loading };
 };
 
 export default useApprovals;
