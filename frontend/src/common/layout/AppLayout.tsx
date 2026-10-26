@@ -24,11 +24,11 @@ const AppLayout = () => {
                 >
                 관리자페이지
               </button>
-              <button 
+              {/* <button 
                className="text-xs text-slate-500 hover:text-slate-900 cursor-pointer"
                onClick={() => navigate("/department")}>
                 부서관리
-              </button>
+              </button> */}
               </>
             )}
 

@@ -6,13 +6,14 @@ import { getUsers } from "../apis/adminApi";
 import { getDepartments } from "../../department/apis/departmentApi";
 import axios from "axios";
 import { useAuth } from "../../user/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const AdminUserPage = () => {
   const [users, setUsers] = useState<AdminUserResponse[]>([]);
   const [departments, setDepartments] = useState<DepartmentResponse[]>([]);
-
+  
   const { user, loading } = useAuth();
-
+  const navigate = useNavigate();
   // TODO: useEffect에서 getUsers(), getDepartments()로 위 state 채우기
 
   useEffect(() => {
@@ -49,7 +50,18 @@ const AdminUserPage = () => {
 
   return (
     <div>
+      <div className="mb-4 flex items-center gap-4">
       <h1 className="mb-4 text-2xl font-bold tracking-tight">사용자 관리</h1>
+      <button onClick={()=>navigate("/department")}
+        className="cursor-pointer rounded-lg border
+        border-slate-200 bg-white px-3 py-1.5
+        text-xs font-semibold text-slate-600 shadow-xs
+        transition
+        hover:border-indigo-200 hover:bg-indigo-50
+        hover:text-indigo-600">
+        부서 관리 
+      </button>
+      </div>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <table className="w-full whitespace-nowrap text-sm">
