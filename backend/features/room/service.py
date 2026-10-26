@@ -130,6 +130,7 @@ def create_room_reservation(db: Session, user: User, data: ReservationCreate):
     # 응답
     return {
         "id": reservation.id,
+        "user_id": user.id,
         "room_id": room.id,
         "room_name": room.name,
         "title": reservation.title,
@@ -145,6 +146,7 @@ def get_reservations(db: Session, user_id: int, scope:str):
     query = (
         select(
             Reservation.id,
+            Reservation.user_id,
             Reservation.room_id,
             MeetingRoom.name.label("room_name"),
             Reservation.title,

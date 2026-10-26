@@ -1,11 +1,17 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ReservationDetailResponse } from "../types/room";
-import { deleteReservation, getMyReservations } from "../apis/roomApi";
+import { deleteReservation, getReservations } from "../apis/roomApi";
 import { card, cardHeader } from "../style";
 import { getErrorMessage, getErrorStatus } from "../utils/error";
+import { useAuth } from "../../user/context/AuthContext";
+
 
 // "2026-11-20T09:30:00" → "09:30"
 const toHHMM = (iso: string) => iso.slice(11, 16);
+
+// 끝난 예약인지
+const isPastReservation = (r: ReservationDetailResponse) =>
+  new Date(r.end_at) < new Date();
 
 // 한 페이지에 보여줄 개수
 const PAGE_SIZE = 10;
@@ -19,18 +25,27 @@ const pageBtn = (active: boolean) =>
   }`;
 
 const MyReservations = () => {
+  const { user } = useAuth();
   const [myReservations, setMyReservations] = useState<ReservationDetailResponse[]>([]);
   const [message, setMessage] = useState<string>("");
   const [page, setPage] = useState<number>(1);
+  const [scope, setScope] = useState<"mine" | "all">("mine");
 
   // 목록 불러오는 함수
-  const load = () => {
-    getMyReservations().then(setMyReservations);
-  };
+  const load = useCallback(() => {
+    getReservations(scope).then((data) => {
+    // 다가오는 예약
+    const upcoming = data.filter((r) => !isPastReservation(r));
+    // 지난 예약이면 순서 뒤집음
+    const past = data.filter((r) => isPastReservation(r)).reverse();
+    setMyReservations([...upcoming, ...past]);
+    });
+  }, [scope]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
+
 
   // 페이징 계산
   const totalPages = Math.max(1, Math.ceil(myReservations.length / PAGE_SIZE));
@@ -61,7 +76,31 @@ const MyReservations = () => {
   return (
     <div className={`flex min-h-0 flex-1 flex-col ${card}`}>
       <div className={cardHeader}>
-        <span className="font-semibold">내 예약</span>
+        {/* 내 예약 / 전체 예약 토글 */}
+        <div className="flex gap-1">
+          <button
+            type="button"
+            onClick={() => {
+              setScope("mine");
+              setPage(1);
+              setMessage("");
+            }}
+            className={pageBtn(scope === "mine")}
+          >
+            내 예약
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setScope("all");
+              setPage(1);
+              setMessage("");
+            }}
+            className={pageBtn(scope === "all")}
+          >
+            전체 예약
+          </button>
+        </div>
         <span className="text-xs text-slate-500">{myReservations.length}건</span>
       </div>
 
@@ -71,7 +110,7 @@ const MyReservations = () => {
         ) : (
           pageItems.map((r) => {
             // 끝난 예약 -> 지난건 회색으로 바꾸고 취소버튼 숨김
-            const isPast = new Date(r.end_at) < new Date();
+            const isPast = isPastReservation(r);
 
             return (
               <div
@@ -89,11 +128,13 @@ const MyReservations = () => {
                 {/* 회의실 */}
                 <span className="w-32 truncate">{r.room_name}</span>
 
+                {scope === "all" && <span className="w-24 truncate">{r.user_name} {r.user_position}</span>}
+
                 {/* 제목 */}
                 <span className="flex-1 truncate">{r.title}</span>
 
                 {/* 취소 */}
-                {!isPast && (
+                {!isPast && r.user_id === user?.id && (
                   <button
                     type="button"
                     onClick={() => handleCancel(r.id)}

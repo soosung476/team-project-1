@@ -41,7 +41,7 @@ export const postReservation = async (
 };
 
 // 내/전체 예약조회
-export const getMyReservations = async (scope: "mine" | "all" = "mine") => {
+export const getReservations = async (scope: "mine" | "all" = "mine") => {
   const response = await axiosInstance.get<ReservationDetailResponse[]>("/reservations", {
     params: { scope },
   });
