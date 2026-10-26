@@ -12,12 +12,12 @@ class MeetingRoomResponse(BaseModel):
 
 class ReservationResponse(BaseModel):
     id: int
-    user_id:int
+    user_id: int
     title: str
     start_at: datetime
     end_at: datetime
     user_name: str
-    user_position: str
+    user_position: str | None
 
 class RoomSlotResponse(BaseModel):
     start_at: datetime
@@ -43,11 +43,12 @@ class ReservationCreate(BaseModel):
 
 class ReservationDetailResponse(BaseModel):
     id: int
+    user_id: int
     room_id: int
     room_name: str
     title: str
     start_at: datetime
     end_at: datetime
     user_name: str
-    user_position: str
+    user_position: str | None
     created_at: datetime
