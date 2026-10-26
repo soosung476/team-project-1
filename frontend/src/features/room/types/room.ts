@@ -13,7 +13,7 @@ export type ReservationResponse = {
     start_at: string;
     end_at: string;
     user_name: string;
-    user_position: string;
+    user_position: string | null;
 }
 
 export type RoomSlotResponse ={
@@ -31,12 +31,13 @@ export type ReservationCreate = {
 
 export type ReservationDetailResponse = {
     id: number;
+    user_id: number;
     room_id: number;
     room_name: string;
     title: string;
     start_at: string;
     end_at: string;
     user_name: string;
-    user_position: string;
+    user_position: string | null;
     created_at: string;
 }
