@@ -39,3 +39,11 @@ export const postReservation = async (
   const response = await axiosInstance.post("/reservations", body);
   return response.data;
 };
+
+// 내/전체 예약조회
+export const getMyReservations = async (scope: "mine" | "all" = "mine") => {
+  const response = await axiosInstance.get<ReservationDetailResponse[]>("/reservations", {
+    params: { scope },
+  });
+  return response.data;
+};
