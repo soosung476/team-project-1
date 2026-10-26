@@ -19,3 +19,11 @@ class AdminUserResponse(BaseModel):
     role: str
     position: str
     department: DepartmentBrief | None
+
+
+class AdminUserPageResponse(BaseModel):
+    items: list[AdminUserResponse]
+    total: int
+    page: int
+    size: int
+    total_pages: int

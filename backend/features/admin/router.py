@@ -6,7 +6,11 @@ from core.dependencies import get_admin_user
 from features.user.models import User
 from features.user.exceptions import UserNotFoundException
 from features.department.exceptions import DepartmentNotFoundException
-from features.admin.schema import AdminUserResponse, AdminUserUpdate
+from features.admin.schema import (
+    AdminUserResponse,
+    AdminUserUpdate,
+    AdminUserPageResponse,
+)
 from features.admin.exceptions import (
     InvalidRoleException,
     InvalidPositionException,
@@ -21,11 +25,15 @@ admin_router = APIRouter(prefix="/admin", tags=["admin"])
 # 로그인 했지만 Admin이 아님 -> 403에러
 # /admin/users 일 때 유저목록을 받아서, 리스트업. 이후 개별 유저에 대한 put, patch함수 작성
 # -> users의 개별에 role과 포지션, 부서가 변경됨.
-@admin_router.get("/users", response_model=list[AdminUserResponse])
+@admin_router.get("/users", response_model=AdminUserPageResponse)
 async def get_users_list(
-    db: Session = Depends(get_db), admin: User = Depends(get_admin_user)
+    db: Session = Depends(get_db),
+    admin: User = Depends(get_admin_user),
+    page: int = 1,
+    size: int = 10,
+    keyword: str = "",
 ):
-    return get_users(db=db)
+    return get_users(db=db, page=page, size=size, keyword=keyword)
 
 
 # /admin/users/{id}
