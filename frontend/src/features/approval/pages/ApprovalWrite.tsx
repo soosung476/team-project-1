@@ -1,5 +1,79 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { getApproval, getApprovers, postApproval } from "../apis/approvalApi";
+import type {
+  ApprovalCreate,
+  ApprovalResponse,
+  UserBrief,
+} from "../types/approval";
+
 // 기안하기
 const ApprovalWrite = () => {
+  const [searchParams] = useSearchParams();
+  const fromId = searchParams.get("from");
+  const navigate = useNavigate();
+  const [form, setForm] = useState<ApprovalCreate>({
+    title: "",
+    content: "",
+    approver_id: 0,
+  });
+  const [approverList, setApproverList] = useState<UserBrief[]>([]);
+
+  const handleSubmit = async (e: React.SubmitEvent) => {
+    e.preventDefault();
+    if (form.approver_id === 0 || form.title === "" || form.content === "") {
+      alert("내용을 전부 채워주세요");
+      return;
+    }
+    try {
+      await postApproval(form);
+      navigate("/approvals");
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        alert(error.response.data.detail);
+      }
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (fromId) {
+          const defaultData: ApprovalResponse = await getApproval(
+            Number(fromId),
+          );
+          setForm(() => ({
+            title: defaultData.title,
+            content: defaultData.content,
+            approver_id: defaultData.approver.id,
+          }));
+        }
+        const data = await getApprovers();
+        setApproverList(data);
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+          alert(error.response.data.detail);
+        }
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, [fromId]);
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement
+    >,
+  ) => {
+    const { name, value } = e.target;
+    if (name === "approver_id") {
+      setForm((prev) => ({ ...prev, [name]: Number(value) }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
   return (
     <div>
       <div className="mb-3 text-sm text-slate-400">
@@ -15,16 +89,26 @@ const ApprovalWrite = () => {
         </p>
       </div>
 
-      <form className="rounded-xl border border-slate-200 bg-white p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="rounded-xl border border-slate-200 bg-white p-6"
+      >
         {/* Approver */}
         <div>
           <label className="mb-2 block text-sm font-semibold">결재자</label>
 
           <select
             name="approver_id"
+            value={form.approver_id}
+            onChange={handleChange}
             className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
           >
             <option value={0}>결재자를 선택하세요</option>
+            {approverList.map((approver) => (
+              <option key={approver.id} value={approver.id}>
+                {approver.position} {approver.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -34,7 +118,9 @@ const ApprovalWrite = () => {
 
           <input
             name="title"
+            value={form.title}
             type="text"
+            onChange={handleChange}
             placeholder="제목을 입력하세요"
             className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none transition placeholder:text-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
           />
@@ -46,7 +132,9 @@ const ApprovalWrite = () => {
 
           <textarea
             name="content"
+            value={form.content}
             rows={10}
+            onChange={handleChange}
             placeholder="내용을 입력하세요"
             className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 outline-none transition placeholder:text-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
           />
@@ -57,6 +145,7 @@ const ApprovalWrite = () => {
           <button
             type="button"
             className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+            onClick={() => navigate(-1)}
           >
             취소
           </button>

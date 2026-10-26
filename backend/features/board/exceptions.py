@@ -23,3 +23,6 @@ class SamePasswordException(Exception):
 
 class UserCredentialsException(Exception):
     pass
+
+class PermissionDeniedError(Exception):
+    pass

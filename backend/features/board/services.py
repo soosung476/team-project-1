@@ -50,7 +50,7 @@ def update(db: Session, data: BoardUpdate, id: int, current_user: User):
     if board is None:
         raise BoardNotFoundException
 
-    if board.author_id != current_user.id:
+    if board.author_id != current_user.id and current_user.role != "admin":
         raise UserCredentialsException
 
     if data.title is not None:
@@ -58,6 +58,7 @@ def update(db: Session, data: BoardUpdate, id: int, current_user: User):
 
     if data.content is not None:
         board.content = data.content
+
 
     db.commit()
     return id
@@ -110,7 +111,7 @@ def delete(db: Session, id: int, current_user: User):
     if board is None:
         raise BoardNotFoundException
 
-    if board.author_id != current_user.id:
+    if board.author_id != current_user.id and current_user.role != "admin":
         raise UserCredentialsException
 
     db.delete(board)

@@ -7,7 +7,13 @@ from features.notice.exceptions import UserCredentialException,NoticeNotFoundExc
 import math
 
 def create_notice(db:Session,data:NoticeCreate,current_user:User):
-    notice = Notice(title=data.title,content=data.content,author_id=current_user.id)
+    notice = Notice(title=data.title,content=data.content,is_pinned=data.is_pinned,author_id=current_user.id)
+
+    if data.is_pinned is not None:
+        if data.is_pinned == "Y" or data.is_pinned == "N":
+            notice.is_pinned = data.is_pinned
+        else: 
+            raise NotMatchedPinnedException
 
     db.add(notice)
     db.commit()

@@ -4,11 +4,12 @@ import { post_notice } from "../apis/noticeApi";
 import { useState } from "react";
 
 const NoticeWrite = () => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<NoticeCreate>({
     title: "",
     content: "",
+    is_pinned: "N",
   });
-  const { title, content } = form;
+  const { title, content, is_pinned } = form;
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -50,6 +51,27 @@ const NoticeWrite = () => {
         className="rounded-xl border border-slate-200 bg-white p-8"
       >
         {/* Title */}
+        <div>
+          <label className="mb-2 block text-sm font-semibold">고정 설정</label>
+          <input
+            onChange={handleChange}
+            value="Y"
+            checked={is_pinned === "Y"}
+            name="is_pinned"
+            type="radio"
+            className="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium hover:bg-slate-50"
+          />
+          Y
+          <input
+            onChange={handleChange}
+            value="N"
+            checked={is_pinned === "N"}
+            name="is_pinned"
+            type="radio"
+            className="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium hover:bg-slate-50"
+          />
+          N
+        </div>
         <div>
           <label className="mb-2 block text-sm font-semibold">제목</label>
 

@@ -16,8 +16,12 @@ async def post_notice(
     # get_admin_user 에서 알아서 403 출력
     current_user:User=Depends(get_admin_user)
 ):
-
-    new_notice = create_notice(db=db,data=data,current_user=current_user)
+    try:
+        new_notice = create_notice(db=db,data=data,current_user=current_user)
+    except NotMatchedPinnedException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,detail=" Y 또는 N 만 입력 가능합니다."
+        )
     
     return {"message":f"{new_notice.id} 번이 생성되었습니다."}  
 
