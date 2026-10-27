@@ -7,14 +7,19 @@ import PageHeader from "../../../common/components/PageHeader";
 import { badge, btnDanger, btnSecondary, card } from "../../../common/style";
 
 const NoticeDetail = () => {
+  // 주소창의 id 가져오기
   const { id } = useParams();
   const navigate = useNavigate();
+  // 해당 id 를 통해 상세 데이터 가져오기
   const data = useNotice(id);
   const [searchParams] = useSearchParams();
+  // 주소단의 page,size 의 값 가져오기 / 기본값 1,10
   const Page = Number(searchParams.get("page")) || 1;
   const Size = Number(searchParams.get("size")) || 10;
 
+  // 로그인확인,유저(role 확인용)
   const { isLoggedIn, user } = useAuth();
+  // 삭제 요청 후 끝나면 전에 있었던 전체 페이지로 이동
   const handleRemove = async (id: string | undefined) => {
     if (!id) return;
 
@@ -56,7 +61,8 @@ const NoticeDetail = () => {
             목록
           </Link>
 
-          {user?.role == "ADMIN" && isLoggedIn && (
+          {/* 관리자만 수정/삭제 버튼이 보임 */}
+          {isLoggedIn && user?.role == "ADMIN" && (
             <div className="flex gap-2">
               <button
                 onClick={() =>

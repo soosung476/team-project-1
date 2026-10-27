@@ -1,4 +1,4 @@
-import axios from "axios";
+// 프론트에서 백엔드 라우터와 연결하기 위한 Api 정의
 import axiosInstance from "../../../common/apis/axios";
 import type { NoticeCreate, NoticeUpdate } from "../types/notice";
 

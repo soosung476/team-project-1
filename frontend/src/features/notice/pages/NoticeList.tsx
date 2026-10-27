@@ -8,20 +8,24 @@
 import { Link, useSearchParams } from "react-router-dom";
 import useNotices from "../hooks/useNotices";
 import { useAuth } from "../../user/context/AuthContext";
-// 페이지 번호는 다른 목록과 같은 공통 컴포넌트를 씀 (props 이름·뜻이 같음)
 import Pagination from "../../../common/components/Pagination";
 import PageHeader from "../../../common/components/PageHeader";
 import { badge, btnPrimary, tableCard, td, th, thead } from "../../../common/style";
 
 const NoticeList = () => {
+  // 주소단 파라미터 page,size의 값 가져오기 / 기본값 1,10
   const [searchParams, setSearchParams] = useSearchParams();
   const Page = Number(searchParams.get("page")) || 1;
   const Size = Number(searchParams.get("size")) || 10;
 
+  // 받은 값을 통해 상세데이터 가져오기
   const data = useNotices(Page, Size);
+  // 상세데이터 안의 값을 꺼내서 사용
   const { total, total_pages } = data;
 
+  // 로그인확인, 유저(role 확인용)
   const { isLoggedIn, user } = useAuth();
+  // Pagination에 넘겨줄 값 정의
   const pageSize = 5;
   const startpage = Math.floor((Page - 1) / pageSize) * pageSize + 1;
   const endpage = Math.min(startpage + pageSize - 1, total_pages);
@@ -35,7 +39,7 @@ const NoticeList = () => {
   return (
     <div>
       <PageHeader title="공지사항" description="회사 공지와 필독 사항을 확인하세요." breadcrumb={["공지사항"]}>
-        {user?.role == "ADMIN" && isLoggedIn && (
+        {isLoggedIn && user?.role == "ADMIN" && (
           <Link to="/notices/write" className={btnPrimary}>
             글쓰기
           </Link>
@@ -71,7 +75,11 @@ const NoticeList = () => {
               <tr
                 key={post.id}
                 // 필독(고정) 공지는 연한 노란 배경으로 구분
-                className={post.is_pinned === "Y" ? "bg-amber-50/50 transition hover:bg-amber-50" : "transition hover:bg-slate-50"}
+                className={
+                  post.is_pinned === "Y"
+                    ? "bg-amber-50/50 transition hover:bg-amber-50"
+                    : "transition hover:bg-slate-50"
+                }
               >
                 <td className={`${td} text-center text-slate-400`}>{post.id}</td>
 
@@ -80,7 +88,9 @@ const NoticeList = () => {
                     to={`/notices/${post.id}?page=${Page}&size=${Size}`}
                     className="font-medium text-slate-800 hover:text-indigo-600"
                   >
-                    {post.is_pinned === "Y" && <span className={`${badge} mr-2 bg-amber-100 text-amber-700`}>필독</span>}
+                    {post.is_pinned === "Y" && (
+                      <span className={`${badge} mr-2 bg-amber-100 text-amber-700`}>필독</span>
+                    )}
                     {post.title}
                   </Link>
                 </td>

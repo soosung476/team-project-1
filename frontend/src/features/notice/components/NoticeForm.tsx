@@ -4,8 +4,10 @@ import type { NoticeCreate, NoticeUpdate } from "../types/notice";
 import PageHeader from "../../../common/components/PageHeader";
 import { btnPrimary, btnSecondary, card, input, label } from "../../../common/style";
 
+// 부모(Write,Edit)로부터 전달받은 data가 있다면 - 수정, 없다면 - 작성
 const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => void; notice?: NoticeCreate }) => {
   const navigate = useNavigate();
+  // useState 초기값 설정
   const [form, setForm] = useState<NoticeCreate>(
     notice ?? {
       title: "",
@@ -13,8 +15,10 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
       is_pinned: "N",
     },
   );
+  // form 안의 값을 꺼내서 사용
   const { title, content, is_pinned } = form;
 
+  // 수정 하면 서버에서 받아 온 내용을 form 상태에 동기화
   useEffect(() => {
     if (notice)
       setForm({
@@ -24,6 +28,7 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
       });
   }, [notice]);
 
+  // 기존 form의 내용 복사 후, 수정 시 실시간 반영해 form 에 저장
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
@@ -35,11 +40,16 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
   return (
     <div>
       {!notice ? (
-        <PageHeader title="공지 작성" description="전 직원에게 알릴 공지를 작성해주세요." breadcrumb={["공지사항", "글쓰기"]} />
+        <PageHeader
+          title="공지 작성"
+          description="전 직원에게 알릴 공지를 작성해주세요."
+          breadcrumb={["공지사항", "글쓰기"]}
+        />
       ) : (
         <PageHeader title="공지 수정" description="공지 내용을 수정해주세요." breadcrumb={["공지사항", "수정"]} />
       )}
 
+      {/* handleChange 가 form 에 저장해 둔 값을 부모에게 전송 */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -112,6 +122,7 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
             취소
           </button>
 
+          {/* 버튼을 누르면 onSubmit */}
           {!notice ? (
             <button type="submit" className={btnPrimary}>
               작성

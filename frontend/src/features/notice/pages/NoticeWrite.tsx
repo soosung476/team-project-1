@@ -8,6 +8,8 @@ const NoticeWrite = () => {
   const [searchParams] = useSearchParams();
   const size = Number(searchParams.get("size")) || 10;
 
+  // 자식이 보내준 form 안의 데이터를 받아 전송
+  // 최초 작성시에는 첫번째 페이지로 전달
   const onSubmit = async (data: NoticeCreate) => {
     try {
       const result = await post_notice(data);
@@ -19,6 +21,7 @@ const NoticeWrite = () => {
   };
 
   return (
+    // NoticeForm 에게 기존데이터 전달
     <div>
       <NoticeForm onSubmit={onSubmit} />
     </div>

@@ -20,7 +20,7 @@ const useNotices = (page: number, size: number) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 서버로 데이터 요청 보내기
+        // api로 요청 보내기
         const serverData = await get_notices(page, size);
         setData(serverData);
       } catch (error) {
