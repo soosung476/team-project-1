@@ -14,3 +14,4 @@ export const adminDeleteReservation = async (id: number) => {
   const response = await axiosInstance.delete(`/admin/reservations/${id}`);
   return response.data;
 };
+

@@ -14,29 +14,29 @@ import PageHeader from "../../../common/components/PageHeader";
 import { btnPrimary, card, cardHeader, cardTitle, input, tabStyle } from "../../../common/style";
 
 const RoomReservation = () => {
-  const { user } = useAuth();
-  const [rooms, setRooms] = useState<MeetingRoomResponse[]>([]);
-  const [reservations, setReservations] = useState<ReservationResponse[]>([]);   
-  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>(getToday());
-  const [slots, setSlots] = useState<RoomSlotResponse[]>([]);
-  const [selectedSlots,setSelectedSlots] = useState<string[]>([]);
-  const [title,setTitle] = useState<string>("");
-  const [submitting, setSubmitting] = useState<boolean>(false); 
-  const [message, setMessage] = useState<string>("");
+  const { user } = useAuth(); //유저
+  const [rooms, setRooms] = useState<MeetingRoomResponse[]>([]); //회의실 
+  const [reservations, setReservations] = useState<ReservationResponse[]>([]);   // 예약 등록 
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null); // 회의실 선택
+  const [selectedDate, setSelectedDate] = useState<string>(getToday()); // 날짜 선택
+  const [slots, setSlots] = useState<RoomSlotResponse[]>([]); // 회의실 시간대 선택
+  const [selectedSlots,setSelectedSlots] = useState<string[]>([]); // 선택된 슬롯
+  const [title,setTitle] = useState<string>(""); // 회의 주제
+  const [submitting, setSubmitting] = useState<boolean>(false); // 전송 
+  const [message, setMessage] = useState<string>(""); //메시지 설정 변수
   const [tab, setTab] = useState<"reserve" | "mine">("reserve"); // 탭 예약하기 / 내예약
 
   // 칸과 겹치는 예약 찾기 (백엔드의 is_overlapping 과 비슷한거임)
   const findReservation = (slot: RoomSlotResponse) =>
     reservations.find(
-      (r) => slot.start_at < r.end_at && slot.end_at > r.start_at,
+      (r) => slot.start_at < r.end_at && slot.end_at > r.start_at, //겹침비교
     );
   
-  // 회의실 목록 불러오기, 첫 번째 회의실이 디폴트
+  // 회의실 목록 불러오기
   useEffect(() => {
     getRooms().then((data) => {
       setRooms(data);
-      if (data.length > 0) setSelectedRoomId(data[0].id);
+      if (data.length > 0) setSelectedRoomId(data[0].id); //회의실 목록 불러와서 회의 실이 한개 이상 있으면 표시, 첫 번째 회의실이 디폴트
     });
   }, []);
 
@@ -74,8 +74,8 @@ const RoomReservation = () => {
 
   // 예약 등록 
   const handleSubmit = async () => {
-    if (selectedRoomId == null || !startAt || !endAt) return;
-    if (title.trim() === "") return;
+    if (selectedRoomId == null || !startAt || !endAt) return; //선택한 회의실이 없으면 return
+    if (title.trim() === "") return; // 회의 제목이 비어 있으면 return
 
     setSubmitting(true);
     setMessage("");
@@ -124,7 +124,7 @@ const RoomReservation = () => {
           type="button"
           onClick={() => {
             setTab("reserve");
-            // 내예약에서 취소하고 오면 시간표 다시호출
+            // 내 예약에서 취소하고 오면 시간표 다시호출
             if (selectedRoomId != null) refresh(selectedRoomId);
           }}
           className={tabStyle(tab === "reserve")}
@@ -160,8 +160,8 @@ const RoomReservation = () => {
                 min={getToday()}
 
                 onChange={(e) => {
-                  setSelectedDate(e.target.value);
-                  setSelectedSlots([]);
+                  setSelectedDate(e.target.value);  // 날짜 선택
+                  setSelectedSlots([]); // 회의실 시간대 선택
                   setMessage("");
                 }}
 

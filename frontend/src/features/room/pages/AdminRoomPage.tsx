@@ -12,9 +12,9 @@ const size = 10;
 
 const AdminRoomPage = () => {
   const { user, loading } = useAuth();
-  const [message, setMessage] = useState<string>("");
-  const [reservations, setReservations] = useState<ReservationDetailResponse[]>([]);
-  const [total, setTotal] = useState(0);
+  const [message, setMessage] = useState<string>(""); // 취소 결과 안내 문구
+  const [reservations, setReservations] = useState<ReservationDetailResponse[]>([]); // 이번 페이지 예약들
+  const [total, setTotal] = useState(0); // 전체 예약 수
 
   // 페이지네이션
   const [page, setPage] = useState(1);
@@ -25,8 +25,9 @@ const AdminRoomPage = () => {
   const startPage = Math.floor((page - 1) / pageSize) * pageSize + 1;
   const endPage = Math.min(startPage + pageSize - 1, totalPages);
 
+  // 예약 목록 불러오는 함수 (user, page 바뀔때만 새로 만들어짐)
   const load = useCallback(() => {
-    if (user?.role !== "ADMIN") return;
+    if (user?.role !== "ADMIN") return; // 관리자 아니면 안부름
     getAdminReservations(page, size).then((data) => {
       // 마지막 페이지 다 지워서 비면 앞 페이지로
       if (data.items.length === 0 && page > 1){
@@ -46,19 +47,22 @@ const AdminRoomPage = () => {
     
   // 관리자 예약 취소
   const handleCancel = async (id: number) => {
-    if (!window.confirm("예약을 취소하시겠습니까?")) return;
+    if (!window.confirm("예약을 취소하시겠습니까?")) return; // 실수로 누르는거 방지
     try {
       const data = await adminDeleteReservation(id);
       setMessage(data.message);
-      load();
+      load(); // 취소하고 목록 다시호출
     } catch (err) {
       setMessage(getErrorMessage(err, "취소 중 오류가 발생했습니다."));
+      // 404면 이미 지워진거라 목록 다시호출
       if (getErrorStatus(err) === 404) load();
     }
   };
   
 
+  // 로그인 정보 불러오는 중이면 아무것도 안그림
   if (loading) return null;
+  // 관리자 아니면 화면 막음 (진짜 막는건 백엔드 get_admin_user)
   if (user?.role !== "ADMIN") {
     return <p className={emptyText}>관리자만 볼 수 있습니다.</p>;
   }
@@ -109,6 +113,7 @@ const AdminRoomPage = () => {
                   </td>
                   {/* 취소 버튼 */}
                   <td className={`${td} text-right`}>
+                    {/* 끝난 예약은 취소버튼 숨김 */}
                     {!isPast && (
                         <button type="button" onClick={() => handleCancel(r.id)} className={btnDangerSm}>
                         취소
@@ -131,6 +136,7 @@ const AdminRoomPage = () => {
         </table>
       </div>
 
+      {/* 페이지 번호 (공통 컴포넌트, AdminUserPage랑 같은거) */}
       <Pagination
         currentPage={page}
         totalPages={totalPages}
@@ -143,3 +149,4 @@ const AdminRoomPage = () => {
 };
 
 export default AdminRoomPage;
+
