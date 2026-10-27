@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { BoardCreate } from "../types/board";
+import PageHeader from "../../../common/components/PageHeader";
+import { btnPrimary, btnSecondary, card, input, label } from "../../../common/style";
 
 const BoardForm = ({ onSubmit, board }: { onSubmit: (board: BoardCreate) => void; board?: BoardCreate }) => {
   const navigate = useNavigate();
@@ -17,80 +19,63 @@ const BoardForm = ({ onSubmit, board }: { onSubmit: (board: BoardCreate) => void
 
   return (
     <div>
-      <div className="mb-4">
-        {!board ? (
-          <>
-            <h1 className="text-2xl font-bold">게시글 작성</h1>
-            <p className="mt-1 text-sm text-slate-500">새로운 게시글을 작성해주세요.</p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-2xl font-bold">게시글 수정</h1>
-            <p className="mt-1 text-sm text-slate-500">게시글을 수정해주세요.</p>
-          </>
-        )}
-      </div>
+      {!board ? (
+        <PageHeader title="게시글 작성" description="새로운 게시글을 작성해주세요." breadcrumb={["게시판", "글쓰기"]} />
+      ) : (
+        <PageHeader title="게시글 수정" description="게시글을 수정해주세요." breadcrumb={["게시판", "수정"]} />
+      )}
 
       <form
-        className="rounded-xl border border-slate-200 bg-white p-6"
+        className={card}
         onSubmit={(e) => {
           e.preventDefault();
           onSubmit(form);
         }}
       >
-        {/* Title */}
-        <div>
-          <label className="mb-2 block text-sm font-semibold">제목</label>
+        <div className="space-y-5 p-6">
+          {/* Title */}
+          <div>
+            <label className={label}>제목</label>
 
-          <input
-            name="title"
-            type="text"
-            placeholder="제목을 입력하세요"
-            value={title}
-            onChange={(e) => handleChange(e)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none transition placeholder:text-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-          />
-        </div>
+            <input
+              name="title"
+              type="text"
+              placeholder="제목을 입력하세요"
+              value={title}
+              onChange={(e) => handleChange(e)}
+              className={`${input} w-full`}
+            />
+          </div>
 
-        {/* Content */}
-        <div className="mt-4">
-          <label className="mb-2 block text-sm font-semibold">내용</label>
+          {/* Content */}
+          <div>
+            <label className={label}>내용</label>
 
-          <textarea
-            name="content"
-            rows={10}
-            placeholder="내용을 입력하세요"
-            value={content}
-            onChange={(e) => handleChange(e)}
-            className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 outline-none transition placeholder:text-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-          />
+            <textarea
+              name="content"
+              rows={12}
+              placeholder="내용을 입력하세요"
+              value={content}
+              onChange={(e) => handleChange(e)}
+              className={`${input} w-full resize-none leading-6`}
+            />
+          </div>
         </div>
 
         {/* Buttons */}
-        <div className="mt-5 flex justify-end gap-2">
-          <button
-            type="button"
-            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
-            onClick={() => navigate(-1)}
-          >
+        <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
+          <button type="button" className={btnSecondary} onClick={() => navigate(-1)}>
             취소
           </button>
           {!board ? (
-            <button
-              type="submit"
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
-            >
+            <button type="submit" className={btnPrimary}>
               작성
             </button>
           ) : (
-            <button
-              type="submit"
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
-            >
+            <button type="submit" className={btnPrimary}>
               수정
             </button>
           )}
-          <></>
         </div>
       </form>
     </div>

@@ -3,6 +3,17 @@ import ApprovalTable from "../components/ApprovalTable";
 import useApprovals from "../hooks/useApprovals";
 import Pagination from "../../../common/components/Pagination";
 import { useState } from "react";
+import { LuSearch } from "react-icons/lu";
+import PageHeader from "../../../common/components/PageHeader";
+import {
+  btnPrimary,
+  btnSecondary,
+  emptyText,
+  input,
+  searchBox,
+  searchInput,
+  tabStyle,
+} from "../../../common/style";
 
 // 내 문서함: 내 기안 / 승인됨 / 반려됨 탭
 const ApprovalList = () => {
@@ -62,108 +73,81 @@ const ApprovalList = () => {
     });
   };
 
-  const changeColor = (type: string) => {
-    const base = "border-b-2 px-4 py-2 text-sm";
-    if (listType === type) {
-      return `${base} border-indigo-600 font-semibold text-indigo-600`;
-    }
-    return `${base} border-transparent font-medium text-slate-500 hover:text-slate-800`;
-  };
-
   return (
     <div>
-      <div className="mb-3 text-sm text-slate-400">
-        Home <span className="mx-2">/</span>
-        <span className="text-slate-600">전자결재</span>
-      </div>
-
-      <div className="mb-4 flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">내 문서함</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            내가 올린 문서와 처리가 끝난 문서를 볼 수 있습니다.
-          </p>
-        </div>
-
-        <div className="flex gap-2">
-          <Link
-            to="/approvals/inbox"
-            className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
-          >
-            결재 대기함
-          </Link>
-          <Link
-            to="/approvals/write"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
-          >
-            기안하기
-          </Link>
-        </div>
-      </div>
+      <PageHeader
+        title="내 문서함"
+        description="내가 올린 문서와 처리가 끝난 문서를 볼 수 있습니다."
+        breadcrumb={["전자결재", "내 문서함"]}
+      >
+        <Link to="/approvals/inbox" className={btnSecondary}>
+          결재 대기함
+        </Link>
+        <Link to="/approvals/write" className={btnPrimary}>
+          기안하기
+        </Link>
+      </PageHeader>
 
       {/* Tabs: 누른 탭 값(tab)을 주소에 넣으면 그 목록을 다시 불러옴 */}
       <div className="mb-4 flex gap-1 border-b border-slate-200">
         <button
           onClick={() => changeTab("drafted")}
-          className={`${changeColor("drafted")}`}
+          className={tabStyle(listType === "drafted")}
         >
           진행중
         </button>
         <button
           onClick={() => changeTab("approved")}
-          className={`${changeColor("approved")}`}
+          className={tabStyle(listType === "approved")}
         >
           승인됨
         </button>
         <button
           onClick={() => changeTab("rejected")}
-          className={`${changeColor("rejected")}`}
+          className={tabStyle(listType === "rejected")}
         >
           반려됨
         </button>
       </div>
 
-      {/* 검색: 어디서 찾을지(criteria) 고르기 + 검색어(keyword) */}
-      <form onSubmit={handleSearch} className="mb-4 flex gap-2">
-        <select
-          name="criteria"
-          value={criteriaInput}
-          onChange={(e) => setCriteriaInput(e.target.value)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500"
-        >
-          <option value="title">제목</option>
-          <option value="drafter">기안자</option>
-          <option value="approver">결재자</option>
-        </select>
+      {/* 왼쪽 전체 개수 / 오른쪽 검색: 어디서 찾을지(criteria) 고르기 + 검색어(keyword) */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">
+          전체 <span className="font-semibold text-slate-900">{total}</span>건
+        </p>
 
-        <div className="flex flex-1 overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-indigo-500">
-          <input
-            name="keyword"
-            value={keywordInput}
-            onChange={(e) => setKeywordInput(e.target.value)}
-            type="text"
-            placeholder="검색어를 입력하세요"
-            className="flex-1 px-3 py-2 text-sm outline-none"
-          />
-          <button
-            type="submit"
-            className="px-5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+        <form onSubmit={handleSearch} className="flex w-full max-w-md gap-2">
+          <select
+            name="criteria"
+            value={criteriaInput}
+            onChange={(e) => setCriteriaInput(e.target.value)}
+            className={input}
           >
+            <option value="title">제목</option>
+            <option value="drafter">기안자</option>
+            <option value="approver">결재자</option>
+          </select>
+
+          <div className={searchBox}>
+            <LuSearch />
+            <input
+              name="keyword"
+              value={keywordInput}
+              onChange={(e) => setKeywordInput(e.target.value)}
+              type="text"
+              placeholder="검색어를 입력하세요"
+              className={searchInput}
+            />
+          </div>
+          <button type="submit" className={btnSecondary}>
             검색
           </button>
-        </div>
-      </form>
-
-      {/* 전체 개수 */}
-      <div className="mb-2 text-sm text-slate-500">
-        전체 <span className="font-semibold text-slate-900">{total}</span>건
+        </form>
       </div>
 
       {/* 로딩 중에는 표 자리만 바꿈 → 탭·검색창은 그대로 보임 */}
       {loading ? (
-        <p className="py-10 text-center text-sm text-slate-400">
-          로딩중입니다.
-        </p>
+        <p className={emptyText}>불러오는 중입니다.</p>
       ) : (
         <ApprovalTable items={items} />
       )}

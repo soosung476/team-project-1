@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import AppLayout from "./common/layout/AppLayout";
+import AuthLayout from "./common/layout/AuthLayout";
 import Home from "./features/home/pages/Home";
 import BoardDetail from "./features/board/pages/BoardDetail";
 import BoardEdit from "./features/board/pages/BoardEdit";
@@ -48,13 +49,17 @@ function App() {
             <Route path=":id" element={<BoardDetail />} />
             <Route path=":id/edit" element={<BoardEdit />} />
           </Route>
+          <Route path="/department" element={<DepartmentPage/>}/>
+          <Route path="/admin/users" element={<AdminUserPage />} />
+          <Route path="/admin/rooms" element={<AdminRoomPage />} />
+        </Route>
+
+        {/* 로그인·회원가입은 사이드바 없이 (AuthLayout) */}
+        <Route element={<AuthLayout />}>
           <Route path="/users">
             <Route path="signin" element={<LoginPage />} />
             <Route path="signup" element={<SignupPage />} />
           </Route>
-          <Route path="/department" element={<DepartmentPage/>}/>
-          <Route path="/admin/users" element={<AdminUserPage />} />
-          <Route path="/admin/rooms" element={<AdminRoomPage />} />
         </Route>
       </Routes>
     </>

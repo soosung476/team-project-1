@@ -5,6 +5,8 @@ import type { ReservationDetailResponse } from "../types/room";
 import { adminDeleteReservation,getAdminReservations } from "../apis/adminRoomApi";
 import { toHHMM } from "../utils/time";
 import { getErrorMessage, getErrorStatus } from "../utils/error";
+import PageHeader from "../../../common/components/PageHeader";
+import { btnDangerSm, card, emptyText, td, th, thead } from "../../../common/style";
 // 한 페이지에 보여줄 예약 수
 const size = 10;
 
@@ -58,26 +60,34 @@ const AdminRoomPage = () => {
 
   if (loading) return null;
   if (user?.role !== "ADMIN") {
-    return <p className="text-slate-500">관리자만 볼 수 있습니다.</p>;
+    return <p className={emptyText}>관리자만 볼 수 있습니다.</p>;
   }
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">회의실 관리</h1>
-        <span className="text-sm text-slate-500">전체 {total}건</span>
+      <PageHeader
+        title="회의실 관리"
+        description="모든 직원의 회의실 예약을 확인하고 취소할 수 있습니다."
+        breadcrumb={["관리자", "회의실 관리"]}
+      />
+
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">
+          전체 <span className="font-semibold text-slate-900">{total}</span>건
+        </p>
+        {message && <p className="text-xs text-slate-600">{message}</p>}
       </div>
-      {message && <p className="mb-2 text-xs text-slate-600">{message}</p>}
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+
+      <div className={`overflow-x-auto ${card}`}>
         <table className="w-full whitespace-nowrap text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50">
+          <thead className={thead}>
             <tr>
-              <th className="px-4 py-2.5 text-left font-medium text-slate-500">날짜</th>
-              <th className="px-4 py-2.5 text-left font-medium text-slate-500">시간</th>
-              <th className="px-4 py-2.5 text-left font-medium text-slate-500">회의실</th>
-              <th className="w-full px-4 py-2.5 text-left font-medium text-slate-500">제목</th>
-              <th className="px-4 py-2.5 text-center font-medium text-slate-500">예약자</th>
-              <th className="px-4 py-2.5"></th>
+              <th className={`${th} text-left`}>날짜</th>
+              <th className={`${th} text-left`}>시간</th>
+              <th className={`${th} text-left`}>회의실</th>
+              <th className={`${th} w-full text-left`}>제목</th>
+              <th className={`${th} text-center`}>예약자</th>
+              <th className={th}></th>
             </tr>
           </thead>
 
@@ -87,20 +97,20 @@ const AdminRoomPage = () => {
               const isPast = new Date(r.end_at) < new Date();
 
               return (
-                <tr key={r.id} className={isPast ? "text-slate-400" : ""}>
-                  <td className="px-4 py-2.5 tabular-nums">{r.start_at.slice(0, 10)}</td>
-                  <td className="px-4 py-2.5 font-medium tabular-nums">
+                <tr key={r.id} className={isPast ? "text-slate-400" : "transition hover:bg-slate-50"}>
+                  <td className={`${td} tabular-nums`}>{r.start_at.slice(0, 10)}</td>
+                  <td className={`${td} font-medium tabular-nums`}>
                     {toHHMM(r.start_at)} ~ {toHHMM(r.end_at)}
                   </td>
-                  <td className="px-4 py-2.5">{r.room_name}</td>
-                  <td className="max-w-0 truncate px-4 py-2.5">{r.title}</td>
-                  <td className="px-4 py-2.5 text-center">
+                  <td className={td}>{r.room_name}</td>
+                  <td className={`${td} max-w-0 truncate`}>{r.title}</td>
+                  <td className={`${td} text-center`}>
                     {r.user_name} {r.user_position}
                   </td>
                   {/* 취소 버튼 */}
-                  <td className="px-4 py-2.5 text-right">
+                  <td className={`${td} text-right`}>
                     {!isPast && (
-                        <button type="button" onClick={() => handleCancel(r.id)} className="rounded-md border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50">
+                        <button type="button" onClick={() => handleCancel(r.id)} className={btnDangerSm}>
                         취소
                         </button>
                     )}
@@ -112,7 +122,7 @@ const AdminRoomPage = () => {
             {/* 예약 없을때 */}
             {reservations.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-12 text-center text-slate-400">
                   예약 내역이 없습니다.
                 </td>
               </tr>

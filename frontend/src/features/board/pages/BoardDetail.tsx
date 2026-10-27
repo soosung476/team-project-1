@@ -6,6 +6,8 @@ import useBoard from "../hooks/useBoard";
 import type { CommentCreate } from "../types/board";
 import { useAuth } from "../../user/context/AuthContext";
 import axios from "axios";
+import PageHeader from "../../../common/components/PageHeader";
+import { btnDanger, btnSecondary, card, emptyText } from "../../../common/style";
 
 const BoardDetail = () => {
   const { id } = useParams();
@@ -80,7 +82,7 @@ const BoardDetail = () => {
 
   if (!board) return;
   if (loading) {
-    return <p>Loading....</p>;
+    return <p className={emptyText}>불러오는 중입니다.</p>;
   }
 
   const isAdmin = user?.role === "admin";
@@ -88,42 +90,36 @@ const BoardDetail = () => {
 
   return (
     <div>
-      <div className="mb-3 text-sm text-slate-400">
-        Home <span className="mx-2">/</span>
-        게시판 <span className="mx-2">/</span>
-        <span className="text-slate-600">게시글</span>
-      </div>
+      <PageHeader title="자유게시판" breadcrumb={["게시판", "게시글"]} />
 
-      <article className="rounded-xl border border-slate-200 bg-white">
+      <article className={card}>
         {/* Header */}
-        <div className="border-b border-slate-200 px-6 py-4">
-          <h1 className="text-xl font-bold">{board.title}</h1>
+        <div className="border-b border-slate-100 px-6 py-5">
+          <h2 className="text-xl font-bold">{board.title}</h2>
 
-          <div className="mt-2 flex items-center gap-4 text-sm text-slate-400">
+          {/* 작성 시각은 "2026-10-27T10:20:30" → "2026-10-27 10:20" 으로 잘라서 보여줌 */}
+          <div className="mt-3 flex items-center gap-3 text-sm text-slate-400">
             <span className="font-medium text-slate-600">{board.author.name}</span>
-            <span>{board.created_at}</span>
-            <span>{board.view_count}</span>
+            <span>{board.created_at.slice(0, 16).replace("T", " ")}</span>
+            <span>조회 {board.view_count}</span>
           </div>
         </div>
 
         {/* Content */}
-        <div className="min-h-40 px-6 py-5 leading-7 text-slate-700">
+        <div className="min-h-48 px-6 py-6 leading-7 text-slate-700">
           <p className="whitespace-pre-wrap wrap-break-words">{board.content}</p>
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-between border-t border-slate-200 px-6 py-3">
-          <Link
-            to={`/boards/?page=${currentPage}&size=${size}`}
-            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
-          >
+        <div className="flex justify-between border-t border-slate-100 px-6 py-4">
+          <Link to={`/boards/?page=${currentPage}&size=${size}`} className={btnSecondary}>
             목록
           </Link>
 
           {canManage && (
             <div className="flex gap-2">
               <button
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+                className={btnSecondary}
                 onClick={() =>
                   navigate({
                     pathname: `/boards/${id}/edit`,
@@ -135,7 +131,7 @@ const BoardDetail = () => {
               </button>
 
               <button
-                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
+                className={btnDanger}
                 onClick={() => {
                   if (confirm("정말로 삭제하시겠습니까?")) {
                     deleteClick(id);

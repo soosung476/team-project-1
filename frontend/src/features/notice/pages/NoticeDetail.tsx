@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import useNotice from "../hooks/useNotice";
 import { useAuth } from "../../user/context/AuthContext";
 import { delete_notice } from "../apis/noticeApi";
+import PageHeader from "../../../common/components/PageHeader";
+import { badge, btnDanger, btnSecondary, card } from "../../../common/style";
 
 const NoticeDetail = () => {
   const { id } = useParams();
@@ -27,33 +29,30 @@ const NoticeDetail = () => {
 
   return (
     <div>
-      <div className="mb-8 text-sm text-slate-400">
-        Home <span className="mx-2">/</span>
-        <span className="text-slate-600">공지글</span>
-      </div>
+      <PageHeader title="공지사항" breadcrumb={["공지사항", "공지 보기"]} />
 
-      <article className="rounded-xl border border-slate-200 bg-white">
+      <article className={card}>
         {/* Header */}
-        <div className="border-b border-slate-200  px-8 py-7">
-          <h1 className="text-2xl font-bold">{data.title}</h1>
+        <div className="border-b border-slate-100 px-6 py-5">
+          <div className="flex items-center gap-2">
+            {data.is_pinned === "Y" && <span className={`${badge} bg-amber-100 text-amber-700`}>필독</span>}
+            <h2 className="text-xl font-bold">{data.title}</h2>
+          </div>
 
-          <div className="mt-4 flex items-center gap-4 text-sm text-slate-400">
+          <div className="mt-3 flex items-center gap-3 text-sm text-slate-400">
             <span className="font-medium text-slate-600">{data.author.name}</span>
             <span>{data.created_at.slice(0, 10)}</span>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="min-h-100 px-8 py-10 leading-8 text-slate-700">
-          <p>{data.content}</p>
+        {/* Content: 줄바꿈을 입력한 그대로 보여줌(whitespace-pre-wrap) */}
+        <div className="min-h-48 px-6 py-6 leading-7 text-slate-700">
+          <p className="whitespace-pre-wrap">{data.content}</p>
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-between border-t border-slate-200 px-8 py-5">
-          <Link
-            to={`/notices?page=${Page}&size=${Size}`}
-            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
-          >
+        <div className="flex justify-between border-t border-slate-100 px-6 py-4">
+          <Link to={`/notices?page=${Page}&size=${Size}`} className={btnSecondary}>
             목록
           </Link>
 
@@ -66,7 +65,7 @@ const NoticeDetail = () => {
                     search: `?page=${Page}&size=${Size}`,
                   })
                 }
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50 "
+                className={btnSecondary}
               >
                 수정
               </button>
@@ -77,7 +76,7 @@ const NoticeDetail = () => {
                     handleRemove(id);
                   }
                 }}
-                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
+                className={btnDanger}
               >
                 삭제
               </button>

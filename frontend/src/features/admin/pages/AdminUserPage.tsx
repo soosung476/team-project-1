@@ -7,7 +7,17 @@ import { getDepartments } from "../../department/apis/departmentApi";
 import axios from "axios";
 import { useAuth } from "../../user/context/AuthContext";
 import Pagination from "../../../common/components/Pagination";
-import { useNavigate } from "react-router-dom";
+import { LuSearch } from "react-icons/lu";
+import PageHeader from "../../../common/components/PageHeader";
+import {
+  btnSecondary,
+  card,
+  emptyText,
+  searchBox,
+  searchInput,
+  th,
+  thead,
+} from "../../../common/style";
 
 // 한 페이지에 보여줄 사용자 수
 // 컴포넌트 밖에 두면 바뀌지 않는 값이라 useEffect 의존성에 넣지 않아도 됨
@@ -22,6 +32,8 @@ const AdminUserPage = () => {
   // 페이지네이션
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  // 전체 사용자 수 (다른 목록처럼 「전체 N명」 표시용)
+  const [total, setTotal] = useState(0);
 
   // 검색: 입력창에 치는 값(keywordInput)과 검색 버튼으로 확정한 값(keyword)을 나눔
   // 서버는 keyword가 바뀔 때만 부르므로 글자를 칠 때마다 요청하지 않음
@@ -32,7 +44,6 @@ const AdminUserPage = () => {
   const pageSize = 5;
   const startPage = Math.floor((page - 1) / pageSize) * pageSize + 1;
   const endPage = Math.min(startPage + pageSize - 1, totalPages);
-  const navigate = useNavigate();
   // TODO: useEffect에서 getUsers(), getDepartments()로 위 state 채우기
 
   // 사용자 목록: 페이지나 검색어가 바뀌면 다시 불러옴
@@ -47,6 +58,7 @@ const AdminUserPage = () => {
         );
         setUsers(userData.items);
         setTotalPages(userData.total_pages);
+        setTotal(userData.total);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           alert(error.response.data.detail);
@@ -85,69 +97,51 @@ const AdminUserPage = () => {
 
   if (loading) return null;
   if (user?.role !== "ADMIN") {
-    return <p className="text-slate-500">관리자만 볼 수 있습니다.</p>;
+    return <p className={emptyText}>관리자만 볼 수 있습니다.</p>;
   }
 
   return (
     <div>
-      {/* 머리: 왼쪽 제목·부서 관리 버튼 / 오른쪽 검색 */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold tracking-tight">사용자 관리</h1>
-          <button
-            onClick={() => navigate("/department")}
-            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-xs transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
-          >
-            부서 관리
-          </button>
-          <button
-            onClick={() => navigate("/admin/rooms")}
-            className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-xs transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600"
-          >
-            회의실 관리
-          </button>
-        </div>
+      {/* 부서 관리·회의실 관리로 가는 버튼은 왼쪽 사이드바 「관리자」 메뉴로 옮김 */}
+      <PageHeader
+        title="사용자 관리"
+        description="직원의 부서·직급·권한을 지정합니다. 바꾼 뒤 그 줄의 저장을 누르세요."
+        breadcrumb={["관리자", "사용자 관리"]}
+      />
 
-        <form
-          onSubmit={handleSearch}
-          className="flex w-72 overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-indigo-500"
-        >
-          <input
-            value={keywordInput}
-            onChange={(e) => setKeywordInput(e.target.value)}
-            type="text"
-            placeholder="이름 또는 이메일"
-            className="flex-1 px-3 py-2 text-sm outline-none"
-          />
-          <button
-            type="submit"
-            className="px-5 text-sm font-medium text-slate-600 hover:bg-slate-50"
-          >
+      {/* 왼쪽 전체 인원 / 오른쪽 검색 (다른 목록 화면과 같은 배치) */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">
+          전체 <span className="font-semibold text-slate-900">{total}</span>명
+        </p>
+
+        <form onSubmit={handleSearch} className="flex w-full max-w-md gap-2">
+          <div className={searchBox}>
+            <LuSearch />
+            <input
+              value={keywordInput}
+              onChange={(e) => setKeywordInput(e.target.value)}
+              type="text"
+              placeholder="이름 또는 이메일"
+              className={searchInput}
+            />
+          </div>
+          <button type="submit" className={btnSecondary}>
             검색
           </button>
         </form>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <div className={`overflow-x-auto ${card}`}>
         <table className="w-full whitespace-nowrap text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50">
+          <thead className={thead}>
             <tr>
-              <th className="px-4 py-2.5 text-left font-medium text-slate-500">
-                이름
-              </th>
-              <th className="w-full px-4 py-2.5 text-left font-medium text-slate-500">
-                이메일
-              </th>
-              <th className="px-4 py-2.5 text-center font-medium text-slate-500">
-                부서
-              </th>
-              <th className="px-4 py-2.5 text-center font-medium text-slate-500">
-                직급
-              </th>
-              <th className="px-4 py-2.5 text-center font-medium text-slate-500">
-                권한
-              </th>
-              <th className="px-4 py-2.5"></th>
+              <th className={`${th} text-left`}>이름</th>
+              <th className={`${th} w-full text-left`}>이메일</th>
+              <th className={`${th} text-center`}>부서</th>
+              <th className={`${th} text-center`}>직급</th>
+              <th className={`${th} text-center`}>권한</th>
+              <th className={th}></th>
             </tr>
           </thead>
 
@@ -163,7 +157,7 @@ const AdminUserPage = () => {
               <tr>
                 <td
                   colSpan={6}
-                  className="px-4 py-10 text-center text-slate-400"
+                  className="px-4 py-12 text-center text-slate-400"
                 >
                   검색 결과가 없습니다.
                 </td>

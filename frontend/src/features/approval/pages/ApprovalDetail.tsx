@@ -4,6 +4,15 @@ import { putApproval } from "../apis/approvalApi";
 import { statusColor, statusLabel } from "../functions/approvalFunction";
 import useApprovalDetail from "../hooks/useApprovalDetail";
 import { useAuth } from "../../user/context/AuthContext";
+import PageHeader from "../../../common/components/PageHeader";
+import {
+  badge,
+  btnDanger,
+  btnPrimary,
+  btnSecondary,
+  card,
+  emptyText,
+} from "../../../common/style";
 
 // 결재 문서 상세
 const ApprovalDetail = () => {
@@ -37,73 +46,65 @@ const ApprovalDetail = () => {
     }
   };
   if (loading) {
-    return <p>로딩중입니다.</p>;
+    return <p className={emptyText}>불러오는 중입니다.</p>;
   }
   if (!items) {
-    return <p>문서를 찾을 수 없습니다.</p>;
+    return <p className={emptyText}>문서를 찾을 수 없습니다.</p>;
   }
 
   return (
     <div>
-      <div className="mb-3 text-sm text-slate-400">
-        Home <span className="mx-2">/</span>
-        전자결재 <span className="mx-2">/</span>
-        <span className="text-slate-600">문서</span>
-      </div>
+      <PageHeader title="결재 문서" breadcrumb={["전자결재", "문서 보기"]} />
 
-      <article className="rounded-xl border border-slate-200 bg-white">
-        {/* Header */}
-        <div className="border-b border-slate-200 px-6 py-4">
+      <article className={card}>
+        {/* Header: 제목 + 상태, 아래에 기안자·결재자·날짜 */}
+        <div className="border-b border-slate-100 px-6 py-5">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold">{items.title}</h1>
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColor(items.status)}`}
-            >
+            <h2 className="text-xl font-bold">{items.title}</h2>
+            <span className={`${badge} ${statusColor(items.status)}`}>
               {statusLabel(items.status)}
             </span>
           </div>
 
-          <div className="mt-2 flex items-center gap-4 text-sm text-slate-400">
-            <span>
-              기안자{" "}
-              <span className="font-medium text-slate-600">
-                {items.drafter.name}
-              </span>
-            </span>
-            <span>
-              결재자{" "}
-              <span className="font-medium text-slate-600">
-                {items.approver.name}
-              </span>
-            </span>
-            <span>
-              기안일{" "}
-              <span className="font-medium text-slate-600">
+          {/* dt(이름표) + dd(값) 한 쌍씩 */}
+          <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-4">
+            <div>
+              <dt className="text-xs text-slate-400">기안자</dt>
+              <dd className="mt-0.5 font-medium text-slate-700">
+                {items.drafter.name} {items.drafter.position}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-slate-400">결재자</dt>
+              <dd className="mt-0.5 font-medium text-slate-700">
+                {items.approver.name} {items.approver.position}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-slate-400">기안일</dt>
+              <dd className="mt-0.5 font-medium text-slate-700">
                 {items.created_at.slice(0, 10)}
-              </span>
-            </span>
+              </dd>
+            </div>
             {items.completed_at && (
-              <span>
-                결재일{" "}
-                <span className="font-medium text-slate-600">
+              <div>
+                <dt className="text-xs text-slate-400">결재일</dt>
+                <dd className="mt-0.5 font-medium text-slate-700">
                   {items.completed_at.slice(0, 10)}
-                </span>
-              </span>
+                </dd>
+              </div>
             )}
-          </div>
+          </dl>
         </div>
 
         {/* Content */}
-        <div className="min-h-40 px-6 py-5 leading-7 text-slate-700">
+        <div className="min-h-48 px-6 py-6 leading-7 text-slate-700">
           <p className="whitespace-pre-wrap">{items.content}</p>
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-between border-t border-slate-200 px-6 py-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
-          >
+        <div className="flex justify-between border-t border-slate-100 px-6 py-4">
+          <button onClick={() => navigate(-1)} className={btnSecondary}>
             목록
           </button>
 
@@ -111,7 +112,7 @@ const ApprovalDetail = () => {
             {items.status === "REJECTED" && items.drafter.id === user?.id && (
               <button
                 onClick={() => navigate(`/approvals/write?from=${items.id}`)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium hover:bg-slate-50"
+                className={btnSecondary}
               >
                 재작성
               </button>
@@ -122,13 +123,13 @@ const ApprovalDetail = () => {
                 <>
                   <button
                     onClick={() => handleSubmit("REJECTED")}
-                    className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
+                    className={btnDanger}
                   >
                     반려
                   </button>
                   <button
                     onClick={() => handleSubmit("APPROVED")}
-                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+                    className={btnPrimary}
                   >
                     승인
                   </button>

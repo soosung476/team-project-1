@@ -4,6 +4,7 @@ import type { AdminUserResponse } from "../types/admin";
 import { updateUser } from "../apis/adminApi";
 import axios from "axios";
 import { useAuth } from "../../user/context/AuthContext";
+import { btnPrimarySm, inputSm, td } from "../../../common/style";
 
 // 한 사람 = 표의 한 줄(tr)
 type AdminUserRowProps = {
@@ -48,16 +49,16 @@ const AdminUserRow = ({ user, departments }: AdminUserRowProps) => {
     }
   };
   return (
-    <tr className="hover:bg-slate-50">
-      <td className="px-4 py-2.5">{user.name}</td>
-      <td className="px-4 py-2.5 text-slate-500">{user.email}</td>
+    <tr className="transition hover:bg-slate-50">
+      <td className={`${td} font-medium text-slate-800`}>{user.name}</td>
+      <td className={`${td} text-slate-500`}>{user.email}</td>
 
       {/* 부서 */}
-      <td className="px-4 py-2.5 text-center">
+      <td className={`${td} text-center`}>
         <select
           value={departmentId}
           onChange={(e) => setDepartmentId(e.target.value)}
-          className="rounded-lg border border-slate-200 px-2 py-1"
+          className={inputSm}
         >
           <option value="" disabled>
             부서 없음
@@ -71,11 +72,11 @@ const AdminUserRow = ({ user, departments }: AdminUserRowProps) => {
       </td>
 
       {/* 직급: 백엔드 POSITION_LEVEL과 글자가 같아야 함 */}
-      <td className="px-4 py-2.5 text-center">
+      <td className={`${td} text-center`}>
         <select
           value={position}
           onChange={(e) => setPosition(e.target.value)}
-          className="rounded-lg border border-slate-200 px-2 py-1"
+          className={inputSm}
         >
           <option value="사원">사원</option>
           <option value="팀장">팀장</option>
@@ -84,22 +85,22 @@ const AdminUserRow = ({ user, departments }: AdminUserRowProps) => {
       </td>
 
       {/* 권한 */}
-      <td className="px-4 py-2.5 text-center">
+      <td className={`${td} text-center`}>
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
           disabled={user.id === me?.id}
-          className="rounded-lg border border-slate-200 px-2 py-1"
+          className={inputSm}
         >
           <option value="USER">USER</option>
           <option value="ADMIN">ADMIN</option>
         </select>
       </td>
 
-      <td className="px-4 py-2.5 text-center">
+      <td className={`${td} text-center`}>
         <button
           onClick={() => handleSave()}
-          className="cursor-pointer rounded-lg bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-700"
+          className={btnPrimarySm}
         >
           저장
         </button>
