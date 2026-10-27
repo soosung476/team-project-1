@@ -50,6 +50,7 @@ def update(db: Session, data: BoardUpdate, id: int, current_user: User):
     if board is None:
         raise BoardNotFoundException
 
+    # 관리자면 내용 수정 가능
     if board.author_id != current_user.id and current_user.role != "ADMIN":
         raise UserCredentialsException
 
@@ -110,6 +111,7 @@ def delete(db: Session, id: int, current_user: User):
     if board is None:
         raise BoardNotFoundException
 
+    # 관리자면 내용 삭제 가능
     if board.author_id != current_user.id and current_user.role != "ADMIN":
         raise UserCredentialsException
 

@@ -10,7 +10,7 @@ from core.dependencies import get_current_user
 
 board_router = APIRouter(prefix="/board", tags=["Boards"])
 
-# 추가
+# 게시물 내용 추가
 @board_router.post("", response_model=dict)
 async def post_board(
     data: BoardCreate,
@@ -23,7 +23,7 @@ async def post_board(
     return {"message": f"{new_board.id} 번이 추가되었습니다."}
 
 
-# 전체 조회
+# 게시물 전체 조회
 @board_router.get("", response_model=BoardPageResponse)
 async def get_boards(
     db: Session = Depends(get_db), 
@@ -37,7 +37,7 @@ async def get_boards(
 
     return result
 
-# 하나만 조회
+# 게시물 중 하나만 조회
 @board_router.get("/{id}", response_model=BoardResponse)
 async def get_board(
     id: int,
@@ -52,7 +52,7 @@ async def get_board(
         )
     return board
 
-# 수정
+# 게시물 내용 수정
 @board_router.put("/{id}", response_model=dict)
 async def put_board(
     id: int,
@@ -66,6 +66,7 @@ async def put_board(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="찾는 board가 없습니다."
         )
+    # 관리자 외 일반인이 다른 사람의 내용에 대한 수정 권한 없음
     except UserCredentialsException:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="수정 권한이 없습니다."
@@ -73,7 +74,7 @@ async def put_board(
         
     return {"message": f"{id} 번이 수정되었습니다."} 
 
-# 삭제
+# 게시물 내용 삭제
 @board_router.delete("/{id}", response_model=dict)
 async def delete_board(
     id: int,
@@ -87,6 +88,7 @@ async def delete_board(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="찾는 board가 없습니다."
         )
+    # 관리자 외 일반인이 다른 사람의 내용에 대한 삭제할 권한 없음
     except UserCredentialsException:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="삭제 권한이 없습니다"

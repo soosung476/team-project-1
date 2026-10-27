@@ -6,7 +6,6 @@ from features.board.exceptions import CommentNotFoundException, UserCredentialsE
 from features.user.models import User
 
 # 댓글 추가
-# 댓글 추가
 def comment_create(data: CommentCreate, post_id: int, author_id: int, db: Session):
     comment = BoardComment(
         content=data.content,
@@ -26,6 +25,7 @@ def comment_update(comment_id: int, data: CommentUpdate, db: Session, current_us
     if comment  is None:
         raise CommentNotFoundException
 
+    # 관리자는 일반인의 댓글 수정 가능
     if comment.author_id != current_user.id and current_user.role != "ADMIN":
         raise UserCredentialsException
 
@@ -43,6 +43,7 @@ def comment_delete(comment_id: int, db: Session, current_user: User):
     if comment is None:
         raise CommentNotFoundException
 
+    # 관리자는 일반인의 댓글 삭제 가능
     if comment.author_id != current_user.id and current_user.role != "ADMIN":
         raise UserCredentialsException
 
