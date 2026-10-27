@@ -1,5 +1,26 @@
 @import "tailwindcss";
 
+/* 기본 글꼴: Pretendard (index.html에서 불러옴)
+   - 한글·영문·숫자의 굵기와 높이가 고르게 맞춰진 무료 글꼴. 국내 웹 서비스에서 널리 씀
+   - Tailwind v4는 @theme 안에 적은 --font-sans 를 화면 전체의 기본 글꼴로 씀
+   - 인터넷이 안 되면 뒤에 적은 글꼴(맥: Apple SD Gothic Neo, 윈도우: 맑은 고딕) 순서로 대신 씀 */
+@theme {
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui,
+    "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+
+/* 버튼·드롭다운 위에서는 손가락 커서
+   - Tailwind v4는 버튼 커서를 기본 화살표로 둠 → 누를 수 있다는 게 안 보임
+   - 눌리지 않는 것(disabled)은 빼고 적용 (Tailwind 공식 업그레이드 안내의 방법) */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* 드롭다운(select) 공통 화살표
    - 브라우저 기본 화살표는 오른쪽 끝에 붙어서 여백(px-2 등)으로 옮길 수 없음
      → appearance: none 으로 끄고, 아래쪽 꺾쇠 그림을 배경으로 직접 그림

@@ -8,7 +8,10 @@
 import { Link, useSearchParams } from "react-router-dom";
 import useNotices from "../hooks/useNotices";
 import { useAuth } from "../../user/context/AuthContext";
-import Pagination from "../components/Pagination";
+// 페이지 번호는 다른 목록과 같은 공통 컴포넌트를 씀 (props 이름·뜻이 같음)
+import Pagination from "../../../common/components/Pagination";
+import PageHeader from "../../../common/components/PageHeader";
+import { badge, btnPrimary, tableCard, td, th, thead } from "../../../common/style";
 
 const NoticeList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,65 +34,60 @@ const NoticeList = () => {
 
   return (
     <div>
-      <div className="mb-8 text-sm text-slate-400">
-        Home <span className="mx-2">/</span>
-        <span className="text-slate-600">공지사항</span>
-      </div>
-
-      <div className="mb-8 flex items-end justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">공지사항</h1>
-
-          <p className="mt-2 text-slate-500">공지사항 내용을 확인하세요.</p>
-        </div>
-
+      <PageHeader title="공지사항" description="회사 공지와 필독 사항을 확인하세요." breadcrumb={["공지사항"]}>
         {user?.role == "ADMIN" && isLoggedIn && (
-          <Link
-            to="/notices/write"
-            className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
-          >
+          <Link to="/notices/write" className={btnPrimary}>
             글쓰기
           </Link>
         )}
-      </div>
+      </PageHeader>
 
       {/* Count */}
-      <div className="mb-3 text-sm text-slate-500">
-        전체 <span className="font-semibold text-slate-900">{total}</span>개의 게시글
-      </div>
+      <p className="mb-3 text-sm text-slate-500">
+        전체 <span className="font-semibold text-slate-900">{total}</span>건
+      </p>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <div className={tableCard}>
         <table className="w-full text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50">
+          <thead className={thead}>
             <tr>
-              <th className="w-20 px-6 py-4 text-center font-medium text-slate-500">번호</th>
-              <th className="px-6 py-4 text-left font-medium text-slate-500">제목</th>
-              <th className="w-32 px-6 py-4 text-center font-medium text-slate-500">작성자</th>
-              <th className="w-32 px-6 py-4 text-center font-medium text-slate-500">작성일</th>
+              <th className={`${th} w-20 text-center`}>번호</th>
+              <th className={`${th} text-left`}>제목</th>
+              <th className={`${th} w-32 text-center`}>작성자</th>
+              <th className={`${th} w-32 text-center`}>작성일</th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-slate-100">
+            {data.items.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-12 text-center text-slate-400">
+                  공지사항이 없습니다.
+                </td>
+              </tr>
+            )}
             {data.items.map((post) => (
               <tr
                 key={post.id}
-                className={post.is_pinned === "Y" ? `transition bg-slate-200` : `transition hover:bg-slate-50`}
+                // 필독(고정) 공지는 연한 노란 배경으로 구분
+                className={post.is_pinned === "Y" ? "bg-amber-50/50 transition hover:bg-amber-50" : "transition hover:bg-slate-50"}
               >
-                <td className="px-6 py-5 text-center text-slate-400">{post.id}</td>
+                <td className={`${td} text-center text-slate-400`}>{post.id}</td>
 
-                <td className="px-6 py-5">
+                <td className={td}>
                   <Link
                     to={`/notices/${post.id}?page=${Page}&size=${Size}`}
                     className="font-medium text-slate-800 hover:text-indigo-600"
                   >
-                    {post.is_pinned === "Y" ? `[고정] ${post.title}` : `${post.title}`}
+                    {post.is_pinned === "Y" && <span className={`${badge} mr-2 bg-amber-100 text-amber-700`}>필독</span>}
+                    {post.title}
                   </Link>
                 </td>
 
-                <td className="px-6 py-5 text-center text-slate-500">{post.author.name}</td>
+                <td className={`${td} text-center text-slate-600`}>{post.author.name}</td>
 
-                <td className="px-6 py-5 text-center text-slate-400">{post.created_at.slice(0, 10)}</td>
+                <td className={`${td} text-center text-slate-400`}>{post.created_at.slice(0, 10)}</td>
               </tr>
             ))}
           </tbody>

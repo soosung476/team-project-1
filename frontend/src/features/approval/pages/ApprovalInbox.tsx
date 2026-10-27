@@ -3,6 +3,16 @@ import ApprovalTable from "../components/ApprovalTable";
 import useApprovals from "../hooks/useApprovals";
 import Pagination from "../../../common/components/Pagination";
 import { useState } from "react";
+import { LuSearch } from "react-icons/lu";
+import PageHeader from "../../../common/components/PageHeader";
+import {
+  btnPrimary,
+  btnSecondary,
+  emptyText,
+  input,
+  searchBox,
+  searchInput,
+} from "../../../common/style";
 
 // 결재 대기함: 내가 결재자이고 아직 처리 안 한 문서
 const ApprovalInbox = () => {
@@ -54,68 +64,56 @@ const ApprovalInbox = () => {
 
   return (
     <div>
-      <div className="mb-3 text-sm text-slate-400">
-        Home <span className="mx-2">/</span>
-        전자결재 <span className="mx-2">/</span>
-        <span className="text-slate-600">결재 대기함</span>
-      </div>
-
-      <div className="mb-4 flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">결재 대기함</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            내가 승인·반려해야 하는 문서입니다.
-          </p>
-        </div>
-
-        <Link
-          to="/approvals"
-          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
-        >
+      <PageHeader
+        title="결재 대기함"
+        description="내가 승인·반려해야 하는 문서입니다."
+        breadcrumb={["전자결재", "결재 대기함"]}
+      >
+        <Link to="/approvals" className={btnSecondary}>
           내 문서함
         </Link>
-      </div>
+        <Link to="/approvals/write" className={btnPrimary}>
+          기안하기
+        </Link>
+      </PageHeader>
 
-      {/* 검색: 결재자는 항상 나라서 제목·기안자만 고름 */}
-      <form onSubmit={handleSearch} className="mb-4 flex gap-2">
-        <select
-          name="criteria"
-          value={criteriaInput}
-          onChange={(e) => setCriteriaInput(e.target.value)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500"
-        >
-          <option value="title">제목</option>
-          <option value="drafter">기안자</option>
-        </select>
+      {/* 왼쪽 전체 개수 / 오른쪽 검색: 결재자는 항상 나라서 제목·기안자만 고름 */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">
+          전체 <span className="font-semibold text-slate-900">{total}</span>건
+        </p>
 
-        <div className="flex flex-1 overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-indigo-500">
-          <input
-            name="keyword"
-            value={keywordInput}
-            onChange={(e) => setKeywordInput(e.target.value)}
-            type="text"
-            placeholder="검색어를 입력하세요"
-            className="flex-1 px-3 py-2 text-sm outline-none"
-          />
-          <button
-            type="submit"
-            className="px-5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+        <form onSubmit={handleSearch} className="flex w-full max-w-md gap-2">
+          <select
+            name="criteria"
+            value={criteriaInput}
+            onChange={(e) => setCriteriaInput(e.target.value)}
+            className={input}
           >
+            <option value="title">제목</option>
+            <option value="drafter">기안자</option>
+          </select>
+
+          <div className={searchBox}>
+            <LuSearch />
+            <input
+              name="keyword"
+              value={keywordInput}
+              onChange={(e) => setKeywordInput(e.target.value)}
+              type="text"
+              placeholder="검색어를 입력하세요"
+              className={searchInput}
+            />
+          </div>
+          <button type="submit" className={btnSecondary}>
             검색
           </button>
-        </div>
-      </form>
-
-      {/* 전체 개수 */}
-      <div className="mb-2 text-sm text-slate-500">
-        전체 <span className="font-semibold text-slate-900">{total}</span>건
+        </form>
       </div>
 
       {/* 로딩 중에는 표 자리만 바꿈 → 검색창은 그대로 보임 */}
       {loading ? (
-        <p className="py-10 text-center text-sm text-slate-400">
-          로딩중입니다.
-        </p>
+        <p className={emptyText}>불러오는 중입니다.</p>
       ) : (
         <ApprovalTable items={items} />
       )}

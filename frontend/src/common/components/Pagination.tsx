@@ -6,6 +6,10 @@ type PaginationProps = {
   end: number;
 };
 
+// 이전·다음 버튼 모양 (둘이 같음)
+const arrowButton =
+  "flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-white text-sm text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40";
+
 const Pagination = ({
   currentPage,
   totalPages,
@@ -15,24 +19,14 @@ const Pagination = ({
 }: PaginationProps) => {
   if (totalPages <= 1) return null;
   return (
-    <div className="flex items-center justify-center gap-1 mt-4">
+    <div className="mt-5 flex items-center justify-center gap-1">
       {/* 이전 버튼 */}
 
       <button
         type="button"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="
-            px-3 py-1.5
-            rounded-md
-            text-sm
-            border border-gray-200
-            bg-white
-            text-gray-600
-            hover:bg-gray-100
-            disabled:opacity-40
-            disabled:cursor-not-allowed
-          "
+        className={arrowButton}
       >
         ‹
       </button>
@@ -45,18 +39,11 @@ const Pagination = ({
             type="button"
             key={pageNumber}
             onClick={() => onPageChange(pageNumber)}
-            className={`
-                w-8 h-8
-                rounded-md
-                text-sm
-                font-medium
-                ${
-                  currentPage === pageNumber
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-600 hover:bg-gray-100"
-                }
-                           
-                        `}
+            className={`h-8 min-w-8 rounded-md px-2 text-sm font-medium transition ${
+              currentPage === pageNumber
+                ? "bg-indigo-600 text-white"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
           >
             {pageNumber}
           </button>
@@ -68,17 +55,7 @@ const Pagination = ({
         type="button"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="
-            px-3 py-1.5
-            rounded-md
-            text-sm
-            border border-gray-200
-            bg-white
-            text-gray-600
-            hover:bg-gray-100
-            disabled:opacity-40
-            disabled:cursor-not-allowed
-          "
+        className={arrowButton}
       >
         ›
       </button>

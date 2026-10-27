@@ -3,6 +3,21 @@ import useBoards from "../hooks/useBoards";
 import Pagination from "../../../common/components/Pagination";
 import { useAuth } from "../../user/context/AuthContext";
 import { useState } from "react";
+import { LuSearch } from "react-icons/lu";
+import PageHeader from "../../../common/components/PageHeader";
+import {
+  btnPrimary,
+  btnSecondary,
+  card,
+  emptyText,
+  input,
+  searchBox,
+  searchInput,
+  tableCard,
+  td,
+  th,
+  thead,
+} from "../../../common/style";
 
 const BoardList = () => {
   // 서버로 데이터 요청
@@ -66,118 +81,113 @@ const BoardList = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
-        <p className="text-slate-600">로그인이 필요합니다</p>
-        <Link to="/users/signin" className="mt-4 inline-block text-indigo-600">
-          로그인하러 가기
-        </Link>
+      <div>
+        <PageHeader title="자유게시판" description="다양한 이야기를 자유롭게 나눠보세요." breadcrumb={["게시판"]} />
+        <div className={`${card} p-12 text-center`}>
+          <p className="text-slate-600">로그인이 필요합니다.</p>
+          <Link to="/users/signin" className={`${btnPrimary} mt-4`}>
+            로그인하러 가기
+          </Link>
+        </div>
       </div>
     );
   }
 
-  if (loading) {
-    return <p>Loading....</p>;
-  }
-
+  // 불러오는 중(loading)에는 아래 표 자리만 바꿈 → 제목·검색창은 그대로 보여서 화면이 깜빡이지 않음
   return (
     <div>
-      <div className="mb-3 text-sm text-slate-400">
-        Home <span className="mx-2">/</span>
-        <span className="text-slate-600">게시판</span>
-      </div>
-
-      <div className="mb-4 flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">자유게시판</h1>
-
-          <p className="mt-1 text-sm text-slate-500">다양한 이야기를 자유롭게 나눠보세요.</p>
-        </div>
+      <PageHeader title="자유게시판" description="다양한 이야기를 자유롭게 나눠보세요." breadcrumb={["게시판"]}>
         {isLoggedIn && (
-          <Link
-            to="/boards/write"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
-          >
-            ✍️ 글쓰기
+          <Link to="/boards/write" className={btnPrimary}>
+            글쓰기
           </Link>
         )}
-      </div>
+      </PageHeader>
 
-      {/* Search */}
-      <div className="mb-4 flex gap-2">
-        <select
-          value={criteria}
-          name="criteria"
-          onChange={onSearchChange}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500"
-        >
-          <option value={"tc"}>제목 + 내용</option>
-          <option value={"t"}>제목</option>
-          <option value={"w"}>작성자</option>
-        </select>
+      {/* 왼쪽 전체 개수 / 오른쪽 검색 */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">
+          전체 <span className="font-semibold text-slate-900">{total}</span>건
+        </p>
 
-        <div className="flex flex-1 overflow-hidden rounded-lg border border-slate-200 bg-white focus-within:border-indigo-500">
-          <input
-            value={keyword}
-            name="keyword"
-            onChange={onSearchChange}
-            onKeyDown={onKeyDown}
-            type="text"
-            placeholder="검색어를 입력하세요"
-            className="flex-1 px-3 py-2 text-sm outline-none"
-          />
+        <div className="flex w-full max-w-md gap-2">
+          <select value={criteria} name="criteria" onChange={onSearchChange} className={input}>
+            <option value={"tc"}>제목 + 내용</option>
+            <option value={"t"}>제목</option>
+            <option value={"w"}>작성자</option>
+          </select>
 
-          <button onClick={onSeachClick} className="px-5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+          <div className={searchBox}>
+            <LuSearch />
+            <input
+              value={keyword}
+              name="keyword"
+              onChange={onSearchChange}
+              onKeyDown={onKeyDown}
+              type="text"
+              placeholder="검색어를 입력하세요"
+              className={searchInput}
+            />
+          </div>
+
+          <button onClick={onSeachClick} className={btnSecondary}>
             검색
           </button>
         </div>
       </div>
 
-      {/* Count */}
-      <div className="mb-2 text-sm text-slate-500">
-        전체 <span className="font-semibold text-slate-900">{total}</span>개의 게시글
-      </div>
-
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50">
-            <tr>
-              <th className="w-20 px-6 py-2.5 text-center font-medium text-slate-500">번호</th>
+      {loading ? (
+        <p className={emptyText}>불러오는 중입니다.</p>
+      ) : (
+        <div className={tableCard}>
+          <table className="w-full text-sm">
+            <thead className={thead}>
+              <tr>
+                <th className={`${th} w-20 text-center`}>번호</th>
 
-              <th className="px-6 py-2.5 text-left font-medium text-slate-500">제목</th>
+                <th className={`${th} text-left`}>제목</th>
 
-              <th className="w-32 px-6 py-2.5 text-center font-medium text-slate-500">작성자</th>
+                <th className={`${th} w-32 text-center`}>작성자</th>
 
-              <th className="w-32 px-6 py-2.5 text-center font-medium text-slate-500">작성일</th>
+                <th className={`${th} w-32 text-center`}>작성일</th>
 
-              <th className="w-24 px-6 py-2.5 text-center font-medium text-slate-500">조회</th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-slate-100">
-            {data.items.map((post) => (
-              <tr key={post.id} className="transition hover:bg-slate-50">
-                <td className="px-6 py-2.5 text-center text-slate-400">{post.id}</td>
-
-                <td className="px-6 py-2.5">
-                  <Link
-                    to={`/boards/${post.id}?page=${currentPage}&size=${size}`}
-                    className="font-medium text-slate-800 hover:text-indigo-600"
-                  >
-                    {post.title}
-                  </Link>
-                </td>
-
-                <td className="px-6 py-2.5 text-center text-slate-500">{post.author.name}</td>
-
-                <td className="px-6 py-2.5 text-center text-slate-400">{post.created_at.slice(0, 10)}</td>
-
-                <td className="px-6 py-2.5 text-center text-slate-400">{post.view_count}</td>
+                <th className={`${th} w-24 text-center`}>조회</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+
+            <tbody className="divide-y divide-slate-100">
+              {data.items.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-12 text-center text-slate-400">
+                    게시글이 없습니다.
+                  </td>
+                </tr>
+              )}
+              {data.items.map((post) => (
+                <tr key={post.id} className="transition hover:bg-slate-50">
+                  <td className={`${td} text-center text-slate-400`}>{post.id}</td>
+
+                  <td className={td}>
+                    <Link
+                      to={`/boards/${post.id}?page=${currentPage}&size=${size}`}
+                      className="font-medium text-slate-800 hover:text-indigo-600"
+                    >
+                      {post.title}
+                    </Link>
+                  </td>
+
+                  <td className={`${td} text-center text-slate-600`}>{post.author.name}</td>
+
+                  <td className={`${td} text-center text-slate-400`}>{post.created_at.slice(0, 10)}</td>
+
+                  <td className={`${td} text-center text-slate-400`}>{post.view_count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Pagination */}
       <Pagination

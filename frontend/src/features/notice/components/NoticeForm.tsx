@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { NoticeCreate, NoticeUpdate } from "../types/notice";
+import PageHeader from "../../../common/components/PageHeader";
+import { btnPrimary, btnSecondary, card, input, label } from "../../../common/style";
 
 const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => void; notice?: NoticeCreate }) => {
   const navigate = useNavigate();
@@ -33,19 +35,9 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
   return (
     <div>
       {!notice ? (
-        <div className="mb-8">
-          <>
-            <h1 className="text-3xl font-bold">게시글 작성</h1>
-            <p className="mt-2 text-slate-500">게시글을 작성해주세요.</p>
-          </>
-        </div>
+        <PageHeader title="공지 작성" description="전 직원에게 알릴 공지를 작성해주세요." breadcrumb={["공지사항", "글쓰기"]} />
       ) : (
-        <div className="mb-8">
-          <>
-            <h1 className="text-3xl font-bold">게시글 수정</h1>
-            <p className="mt-2 text-slate-500">게시글을 수정해주세요.</p>
-          </>
-        </div>
+        <PageHeader title="공지 수정" description="공지 내용을 수정해주세요." breadcrumb={["공지사항", "수정"]} />
       )}
 
       <form
@@ -53,80 +45,79 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
           e.preventDefault();
           onSubmit(form);
         }}
-        className="rounded-xl border border-slate-200 bg-white p-8"
+        className={card}
       >
-        {/* Title */}
-        <div>
-          <label className="mb-2 block text-sm font-semibold">고정 설정</label>
-          <input
-            onChange={handleChange}
-            value="Y"
-            checked={is_pinned === "Y"}
-            name="is_pinned"
-            type="radio"
-            className="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium hover:bg-slate-50"
-          />
-          Y
-          <input
-            onChange={handleChange}
-            value="N"
-            checked={is_pinned === "N"}
-            name="is_pinned"
-            type="radio"
-            className="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium hover:bg-slate-50"
-          />
-          N
-        </div>
+        <div className="space-y-5 p-6">
+          {/* 고정 설정: Y면 목록 맨 위·홈 「필독 공지」에 보임 */}
+          <div>
+            <p className={label}>고정 설정</p>
+            <div className="flex gap-6 text-sm text-slate-700">
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  onChange={handleChange}
+                  value="Y"
+                  checked={is_pinned === "Y"}
+                  name="is_pinned"
+                  type="radio"
+                  className="h-4 w-4 accent-indigo-600"
+                />
+                필독 (상단 고정)
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <input
+                  onChange={handleChange}
+                  value="N"
+                  checked={is_pinned === "N"}
+                  name="is_pinned"
+                  type="radio"
+                  className="h-4 w-4 accent-indigo-600"
+                />
+                일반
+              </label>
+            </div>
+          </div>
 
-        <div>
-          <label className="mb-2 block text-sm font-semibold">제목</label>
+          {/* Title */}
+          <div>
+            <label className={label}>제목</label>
 
-          <input
-            onChange={handleChange}
-            value={title}
-            name="title"
-            type="text"
-            placeholder="제목을 입력하세요"
-            className="w-full rounded-lg border border-slate-200 px-4 py-3 outline-none transition placeholder:text-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-          />
-        </div>
+            <input
+              onChange={handleChange}
+              value={title}
+              name="title"
+              type="text"
+              placeholder="제목을 입력하세요"
+              className={`${input} w-full`}
+            />
+          </div>
 
-        {/* Content */}
-        <div className="mt-6">
-          <label className="mb-2 block text-sm font-semibold">내용</label>
+          {/* Content */}
+          <div>
+            <label className={label}>내용</label>
 
-          <textarea
-            onChange={handleChange}
-            value={content}
-            name="content"
-            rows={5}
-            placeholder="내용을 입력하세요"
-            className="w-full resize-none rounded-lg border border-slate-200 px-4 py-3 outline-none transition placeholder:text-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-          />
+            <textarea
+              onChange={handleChange}
+              value={content}
+              name="content"
+              rows={12}
+              placeholder="내용을 입력하세요"
+              className={`${input} w-full resize-none leading-6`}
+            />
+          </div>
         </div>
 
         {/* Buttons */}
-        <div className="mt-8 flex justify-end gap-2">
-          <button
-            onClick={() => navigate(-1)}
-            type="button"
-            className="rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-medium hover:bg-slate-50"
-          >
+        <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
+          <button onClick={() => navigate(-1)} type="button" className={btnSecondary}>
             취소
           </button>
 
           {!notice ? (
-            <button
-              type="submit"
-              className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            >
+            <button type="submit" className={btnPrimary}>
               작성
             </button>
           ) : (
-            <button
-              type="submit"
-              className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700"
-            >
+            <button type="submit" className={btnPrimary}>
               수정
             </button>
           )}
