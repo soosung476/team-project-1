@@ -9,7 +9,6 @@ class MeetingRoomResponse(BaseModel):
     capacity: int
     location: str
 
-
 class ReservationResponse(BaseModel):
     id: int
     user_id: int
@@ -61,3 +60,4 @@ class AdminReservationPageResponse(BaseModel):
     page: int
     size: int
     total_pages: int
+

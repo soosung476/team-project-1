@@ -1,4 +1,5 @@
 
+// 회의실 조회 응답
 export type MeetingRoomResponse = {
     id: number; 
     name: string;
@@ -6,6 +7,7 @@ export type MeetingRoomResponse = {
     location: string;
 }
 
+// 회의실 예약 현황 응답
 export type ReservationResponse = {
     id: number;
     user_id: number;
@@ -16,12 +18,14 @@ export type ReservationResponse = {
     user_position: string | null;
 }
 
+// 예약가능한 시간대 조회 응답
 export type RoomSlotResponse ={
     start_at: string;
     end_at: string;
     available: boolean;
 }
 
+// 예약 등록
 export type ReservationCreate = {
     room_id: number;
     title: string;
@@ -29,6 +33,7 @@ export type ReservationCreate = {
     end_at: string;
 }
 
+// 예약 조회 응답
 export type ReservationDetailResponse = {
     id: number;
     user_id: number;
