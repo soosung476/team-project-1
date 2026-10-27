@@ -26,7 +26,7 @@ def comment_update(comment_id: int, data: CommentUpdate, db: Session, current_us
     if comment  is None:
         raise CommentNotFoundException
 
-    if comment.author_id != current_user.id and current_user.role != "admin":
+    if comment.author_id != current_user.id and current_user.role != "ADMIN":
         raise UserCredentialsException
 
     if data.content is not None:
@@ -43,7 +43,7 @@ def comment_delete(comment_id: int, db: Session, current_user: User):
     if comment is None:
         raise CommentNotFoundException
 
-    if comment.author_id != current_user.id and current_user.role != "admin":
+    if comment.author_id != current_user.id and current_user.role != "ADMIN":
         raise UserCredentialsException
 
     db.delete(comment)
