@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { ReservationDetailResponse } from "../types/room";
 import { deleteReservation, getReservations } from "../apis/roomApi";
 import { btnDangerSm, card, cardHeader, emptyText, segmentStyle } from "../../../common/style";
+import Pagination from "../../../common/components/Pagination";
 import { getErrorMessage, getErrorStatus } from "../utils/error";
 import { useAuth } from "../../user/context/AuthContext";
 
@@ -16,13 +17,9 @@ const isPastReservation = (r: ReservationDetailResponse) =>
 // 한 페이지에 보여줄 개수
 const PAGE_SIZE = 10;
 
-// 페이지 버튼 스타일 (공통 Pagination과 같은 모양: 지금 페이지만 남색)
-const pageBtn = (active: boolean) =>
-  `h-8 min-w-8 rounded-md px-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ${
-    active
-      ? "bg-indigo-600 text-white"
-      : "text-slate-600 hover:bg-slate-100"
-  }`;
+// 화면에 한 번에 보여줄 페이지 번호 개수 (다른 목록과 같이 5개씩)
+// 번호를 전부 그리면 전체 예약처럼 페이지가 많을 때 한 줄을 넘어 양옆이 잘림
+const PAGE_BLOCK = 5;
 
 const MyReservations = () => {
   const { user } = useAuth();
@@ -55,6 +52,9 @@ const MyReservations = () => {
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
   );
+  // 보여줄 번호 범위 (예: 7페이지면 6~10) — 게시판·관리자 목록과 같은 계산
+  const startPage = Math.floor((currentPage - 1) / PAGE_BLOCK) * PAGE_BLOCK + 1;
+  const endPage = Math.min(startPage + PAGE_BLOCK - 1, totalPages);
 
   // 예약 취소
   const handleCancel = async (id: number) => {
@@ -166,37 +166,16 @@ const MyReservations = () => {
         <p className="border-t border-slate-100 px-5 py-2.5 text-xs text-slate-700">{message}</p>
       )}
 
-      {/* 페이지 버튼 (1페이지 넘을때만) */}
+      {/* 페이지 번호 (1페이지 넘을때만): 다른 목록과 같은 공통 컴포넌트 */}
       {totalPages > 1 && (
-        <div className="flex shrink-0 items-center justify-center gap-1 border-t border-slate-100 px-5 py-3">
-          <button
-            type="button"
-            onClick={() => setPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={pageBtn(false)}
-          >
-            이전
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setPage(n)}
-              className={pageBtn(n === currentPage)}
-            >
-              {n}
-            </button>
-          ))}
-
-          <button
-            type="button"
-            onClick={() => setPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={pageBtn(false)}
-          >
-            다음
-          </button>
+        <div className="shrink-0 border-t border-slate-100 pb-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            start={startPage}
+            end={endPage}
+          />
         </div>
       )}
     </div>
