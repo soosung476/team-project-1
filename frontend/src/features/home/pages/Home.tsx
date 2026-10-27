@@ -1,27 +1,26 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { LuFilePen, LuInbox, LuMegaphone } from "react-icons/lu";
-import useNotices from "../../notice/hooks/useNotices";
-import type { ApprovalPageResponse } from "../../approval/types/approval";
-import { getApprovalList } from "../../approval/apis/approvalApi";
-import { initialApprovals } from "../../approval/hooks/useApprovals";
-import { useAuth } from "../../user/context/AuthContext";
+import { Link } from "react-router-dom";
 import PageHeader from "../../../common/components/PageHeader";
 import { btnPrimary, btnSecondary, card, cardHeader, cardTitle, emptyText } from "../../../common/style";
+import { getApprovalList } from "../../approval/apis/approvalApi";
+import { initialApprovals } from "../../approval/hooks/useApprovals";
+import type { ApprovalPageResponse } from "../../approval/types/approval";
+import { get_notices } from "../../notice/apis/noticeApi";
+import { BaseNotices } from "../../notice/hooks/useNotices";
+import type { NoticeListResponse } from "../../notice/types/notice";
+import { useAuth } from "../../user/context/AuthContext";
 
 const Home = () => {
-  // 공지사항은 로그인 없이도 볼 수 있음
-  // 백엔드가 고정글(필독)은 페이지와 상관없이 전부 앞에 붙여 주므로 1페이지만 받으면 됨
-  const notices = useNotices(1, 5);
-  // 필독(is_pinned === "Y")만 남기기
-  const pinnedNotices = notices.items.filter((notice) => notice.is_pinned === "Y");
-
   // 결재 목록 응답은 { items, total, page, size, total_pages } 모양
   const [pending, setPending] = useState<ApprovalPageResponse>(initialApprovals);
   const [drafted, setDrafted] = useState<ApprovalPageResponse>(initialApprovals);
+  const [notices, setNotices] = useState<NoticeListResponse>(BaseNotices);
   const { isLoggedIn, user } = useAuth();
+  // 필독(is_pinned === "Y")만 남기기
+  const pinnedNotices = notices.items.filter((notice) => notice.is_pinned === "Y");
 
-  // 결재 목록은 로그인했을 때만 요청
+  // 결재 목록, 공지사항은 로그인했을 때만 요청
   // (로그인 안 한 상태로 요청하면 401 → 로그인 페이지로 이동되기 때문)
   useEffect(() => {
     if (!isLoggedIn) {
@@ -33,6 +32,8 @@ const Home = () => {
         setPending(await getApprovalList("pending", 1, 5, "title", ""));
         // 내 기안: 개수(total)만 쓰므로 1개만 받음
         setDrafted(await getApprovalList("drafted", 1, 1, "title", ""));
+        // 백엔드가 고정글(필독)은 페이지와 상관없이 전부 앞에 붙여 주므로 1페이지만 받으면 됨
+        setNotices(await get_notices(1, 5));
       } catch (error) {
         console.log(error);
       }
@@ -100,8 +101,8 @@ const Home = () => {
             </span>
           </div>
           <p className="mt-2 text-3xl font-bold tracking-tight">
-            {pinnedNotices.length}
-            <span className="ml-1 text-sm font-medium text-slate-400">건</span>
+            {isLoggedIn ? pinnedNotices.length : "-"}
+            {isLoggedIn && <span className="ml-1 text-sm font-medium text-slate-400">건</span>}
           </p>
           <p className="mt-1 text-xs text-slate-400">상단에 고정된 공지</p>
         </Link>
@@ -159,7 +160,9 @@ const Home = () => {
             </Link>
           </div>
 
-          {pinnedNotices.length === 0 ? (
+          {!isLoggedIn ? (
+            <p className={emptyText}>로그인 후 확인할 수 있습니다.</p>
+          ) : pinnedNotices.length === 0 ? (
             <p className={emptyText}>필독 공지가 없습니다.</p>
           ) : (
             <div className="divide-y divide-slate-100">

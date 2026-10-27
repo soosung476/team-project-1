@@ -62,7 +62,7 @@ async def delete_notice(
 
 @notice_router.get("",response_model=NoticeListResponse)
 async def get_notices(page:int=1,size:int=10,
-    db:Session = Depends(get_db)):
+    db:Session = Depends(get_db),current_user:User=Depends(get_current_user)):
 
     try:
         result = get_all_notices(page=page,size=size,db=db)
