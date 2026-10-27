@@ -23,7 +23,7 @@ const useNotice = (id: string | undefined) => {
     const fetchData = async () => {
       if (!id) return;
       try {
-        // 서버로 데이터 요청 보내기
+        // api로 요청 보내기
         const serverData = await get_notice(id);
         setData(serverData);
       } catch (error) {

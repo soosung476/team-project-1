@@ -1,3 +1,4 @@
+// 백엔드의 schema 처럼, 전달할 데이터 타입 지정
 export type UserResponse = {
   id: number;
   name: string;
