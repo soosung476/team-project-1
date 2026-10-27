@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from features.board.schemas import BoardResponse, BoardCreate, BoardUpdate, BoardPageResponse
-from features.board.services import create, update, select_all, select_one, delete, recentPosts
+from features.board.services import create, update, select_all, select_one, delete
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
@@ -22,10 +22,6 @@ async def post_board(
 
     return {"message": f"{new_board.id} 번이 추가되었습니다."}
 
-# 최신글 조회
-@board_router.get("/recents", response_model=list[BoardResponse])
-async def get_board_recents(db: Session = Depends(get_db)):
-    return recentPosts(db=db)
 
 # 전체 조회
 @board_router.get("", response_model=BoardPageResponse)

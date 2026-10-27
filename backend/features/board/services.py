@@ -63,10 +63,6 @@ def update(db: Session, data: BoardUpdate, id: int, current_user: User):
     return id
 
 
-def recentPosts(db: Session, limit: int = 5):
-
-    return db.query(Board).order_by(Board.created_at.desc()).limit(limit).all()
-
 
 # 전체 조회
 def select_all(
