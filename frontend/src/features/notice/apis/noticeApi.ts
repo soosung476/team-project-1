@@ -6,7 +6,7 @@ const url = `http://localhost:8000/notice`;
 
 // 전체 페이지
 export const get_notices = async (page: number, size: number) => {
-  const response = await axios.get(`${url}`, { params: { page, size } });
+  const response = await axiosInstance.get(`${url}`, { params: { page, size } });
   return response.data;
 };
 // 페이지 상세내용
