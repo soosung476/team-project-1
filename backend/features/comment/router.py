@@ -34,6 +34,7 @@ async def put_comment(comment_id: int, data: CommentUpdate, db: Session = Depend
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="수정 할 comment 가 없습니다."
         )
+    # 관리자 외 일반인이 다른 사람 댓글 수정 권한 없음
     except UserCredentialsException:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="수정 권한이 없습니다.")
 
@@ -49,6 +50,7 @@ async def delete_comment(comment_id: int, db: Session = Depends(get_db), current
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="삭제 할 comment 가 없습니다."
         )
+    # 관리자 외 일반인이 다른 사람의 댓글을 삭제 할 권한이 없음
     except UserCredentialsException:
         raise HTTPException(status_code=403, detail="삭제 권한이 없습니다")
 
