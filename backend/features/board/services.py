@@ -7,7 +7,8 @@ from features.board.exceptions import BoardNotFoundException, UserCredentialsExc
 import math
 from features.user.models import User
 
-#게시글 조회수
+
+# 게시글 조회수
 def select_one(db: Session, id: int):
 
     stmt = (
@@ -23,19 +24,18 @@ def select_one(db: Session, id: int):
 
     if board is None:
         raise BoardNotFoundException
-    
+
     # 1번 조회 할 때마다 1씩 증가
     board.view_count = (board.view_count or 0) + 1
     db.commit()
 
     return board
 
+
 # 제목, 내용 추가
 def create(db: Session, data: BoardCreate, current_user: User):
 
-    board = Board(
-        title=data.title, content=data.content, author_id=current_user.id
-    )   
+    board = Board(title=data.title, content=data.content, author_id=current_user.id)
     db.add(board)
     db.commit()
     db.refresh(board)
@@ -50,7 +50,7 @@ def update(db: Session, data: BoardUpdate, id: int, current_user: User):
     if board is None:
         raise BoardNotFoundException
 
-    if board.author_id != current_user.id and current_user.role != "admin":
+    if board.author_id != current_user.id and current_user.role != "ADMIN":
         raise UserCredentialsException
 
     if data.title is not None:
@@ -59,17 +59,19 @@ def update(db: Session, data: BoardUpdate, id: int, current_user: User):
     if data.content is not None:
         board.content = data.content
 
-
     db.commit()
     return id
 
 
-def recentPosts(db: Session, limit: int = 5 ):
+def recentPosts(db: Session, limit: int = 5):
 
     return db.query(Board).order_by(Board.created_at.desc()).limit(limit).all()
 
+
 # 전체 조회
-def select_all(db: Session, page: int, size: int, criteria: str = "tc", keyword: str = ""):
+def select_all(
+    db: Session, page: int, size: int, criteria: str = "tc", keyword: str = ""
+):
 
     query = db.query(Board)
 
@@ -103,6 +105,7 @@ def select_all(db: Session, page: int, size: int, criteria: str = "tc", keyword:
         "keyword": keyword,
     }
 
+
 # 삭제
 def delete(db: Session, id: int, current_user: User):
 
@@ -111,7 +114,7 @@ def delete(db: Session, id: int, current_user: User):
     if board is None:
         raise BoardNotFoundException
 
-    if board.author_id != current_user.id and current_user.role != "admin":
+    if board.author_id != current_user.id and current_user.role != "ADMIN":
         raise UserCredentialsException
 
     db.delete(board)

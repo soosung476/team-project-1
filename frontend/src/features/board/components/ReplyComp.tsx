@@ -19,7 +19,7 @@ export type ReplyProps = {
 
 const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCommentEdit }: ReplyProps) => {
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "ADMIN";
   const canManage = (authorId: number) => user?.id === authorId || isAdmin;
 
   const [commentContent, setCommentContent] = useState("");

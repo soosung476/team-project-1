@@ -85,7 +85,7 @@ const BoardDetail = () => {
     return <p className={emptyText}>불러오는 중입니다.</p>;
   }
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "ADMIN";
   const canManage = user?.id === board.author_id || isAdmin;
 
   return (
