@@ -69,9 +69,18 @@ def get_room_slots(db: Session, room_id: int, target_date: date):
 
     return slots
 
+def get_max_reservation_date() -> date:
+    today = date.today()
+    try:
+        return today.replace(year=today.year + 1)
+    except ValueError:
+        return today.replace(year=today.year + 1, day=28)
+
+
 def create_room_reservation(db: Session, user: User, data: ReservationCreate):
     # 요청한 room_id로 회의실 조회
     room = db.get(MeetingRoom,data.room_id)
+    max_date = get_max_reservation_date()
     # 회의실이 존재 하지 않을때
     if room is None:
         raise HTTPException(status_code=404, detail={"code":"ROOM_NOT_FOUND","message":"회의실을 찾을 수 없습니다."})
@@ -84,6 +93,8 @@ def create_room_reservation(db: Session, user: User, data: ReservationCreate):
     # 예약 종료가 시작보다 빠를때
     elif data.start_at >= data.end_at:
         raise HTTPException(status_code=400, detail= {"code":"INVALID_TIME_RANGE", "message":"시작이 종료보다 빨라야 합니다."})
+    elif data.start_at.date() > max_date:
+        raise HTTPException(status_code=400, detail={"code":"OUT_OF_RESERVATION_RANGE", "message":f"예약은 {max_date}까지만 가능합니다."})
     
     # 시간 단위 검사
     correct_time = data.start_at.minute in (0,30) and data.start_at.second == 0 and data.end_at.minute in (0,30) and data.end_at.second == 0

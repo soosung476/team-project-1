@@ -9,3 +9,10 @@ export const getToday = () => {
   const now = new Date();
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 };
+
+// 예약 가능한 마지막 날짜 "YYYY-MM-DD" (오늘 + 1년)
+export const getMaxDate = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return `${d.getFullYear()}-${pad((d.getMonth() + 1))}-${pad(d.getDate())}`;
+};
