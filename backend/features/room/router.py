@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from features.room.models import MeetingRoom
 from features.room.schema import MeetingRoomResponse, ReservationResponse, RoomSlotResponse, ReservationCreate, ReservationDetailResponse, AdminReservationPageResponse
-from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation, get_reservations, cancel_reservation, get_admin_reservations, admin_cancel_reservation
+from features.room.service import get_meeting_rooms, get_room_reservations, get_room_slots, create_room_reservation, get_reservations, cancel_reservation, get_admin_reservations, admin_cancel_reservation, get_max_reservation_date
 from core.dependencies import get_current_user, get_admin_user
 from features.user.models import User
 from typing import Literal
@@ -34,12 +34,15 @@ def list_room_slots(
     db: Session = Depends(get_db),
 ):
     room = db.get(MeetingRoom, room_id)
+    max_date = get_max_reservation_date()
     if room is None:
         raise HTTPException(status_code=404, detail={"code":"ROOM_NOT_FOUND","message":"예약가능한 회의실이 없습니다."})
     elif room.is_active != 'Y':
         raise HTTPException(status_code=400, detail={"code":"ROOM_INACTIVE","message":"사용할 수 없는 회의실입니다."})
     elif date < date.today():
         raise HTTPException(status_code=400, detail={"code":"PAST_DATE", "message":"이미 지난 날짜 입니다."})
+    elif date > max_date:
+        raise HTTPException(status_code=400, detail={"code":"OUT_OF_RESERVATION_RANGE", "message":f"예약은 {max_date}까지만 가능합니다."})
     return get_room_slots(db,room_id,date)
 
 # 기존 고정 경로하고 달라서 reservations로 하나 더 만듬 
