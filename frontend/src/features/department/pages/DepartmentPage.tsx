@@ -20,7 +20,7 @@ import {
     inputSm,
     label,
 } from "../../../common/style";
-
+import { useAuth } from "../../user/context/AuthContext";
 
 
 export default function DepartmentPage() {
@@ -30,14 +30,18 @@ export default function DepartmentPage() {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editName, setEditName] = useState("");
 
+    const { user, loading } = useAuth();
+
+
     const fetchDepartments = async () => {
         const data = await getDepartments();
         setDepartments(data);
     };
 
     useEffect(()=> {
+        if (user?.role !== "ADMIN")return;
         fetchDepartments();
-    }, []);
+    }, [user]);
     
     const handleCreate = async () => {
         const createdDept = await CreateDepartment({ name: newName});
@@ -63,6 +67,11 @@ export default function DepartmentPage() {
         setEditingId(null);
         fetchDepartments();
     };
+
+    if (loading) return null;
+    if (user?.role !== "ADMIN"){
+        return <p className={emptyText}>관리자만 볼 수 있습니다.</p>;
+    }
 
     return (
         <div>

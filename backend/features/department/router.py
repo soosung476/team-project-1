@@ -4,10 +4,10 @@ from db.database import get_db
 from features.department.schema import DepartmentResponse,DepartmentCreate,DepartmentUpdate
 from features.department import service
 from features.department.exceptions import DepartmentExistingException,DepartmentNotFoundException,DepartmentHasUsersException
-from core.dependencies import get_current_user
+from core.dependencies import get_admin_user
 
 
-router = APIRouter(prefix="/department", tags=["departments"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/department", tags=["departments"], dependencies=[Depends(get_admin_user)])
 
 
 @router.get("", response_model=list[DepartmentResponse])
