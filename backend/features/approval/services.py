@@ -16,9 +16,13 @@ from features.approval.exceptions import (
 )
 
 
+# approval page에서 검색기능을 위해 만든 새로운 함수.
 def get_approval_page(
     db: Session, conditions, order, page: int, size: int, criteria: str, keyword: str
 ):
+
+    # keyword 에 title, drafter, approver를 검색 기준으로 세울 수 있다.
+    # title은 제목, drafter는 기안자, approver는 결제자.
 
     if keyword:
         if criteria == "title":
@@ -30,6 +34,9 @@ def get_approval_page(
                 ApprovalDocument.approver.has(User.name.contains(keyword))
             )
 
+
+    # keyword에 따라서 condition이 달라지고 해당 컨디션의 count를 조회해 total에 넣음.
+    # offset은 데이터를 조회할 때 앞에서부터 건너뛸 데이터의 개수. page-1 * size 현재페이지-1의 사이즈를 곱하면 됨.
     offset = (page - 1) * size
     total = db.scalar(
         select(func.count()).select_from(ApprovalDocument).where(*conditions)

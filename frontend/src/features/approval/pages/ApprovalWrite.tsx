@@ -26,6 +26,7 @@ const ApprovalWrite = () => {
     content: "",
     approver_id: 0,
   });
+  const [original, setOriginal] = useState<ApprovalCreate | null>(null);
   const [approverList, setApproverList] = useState<UserBrief[]>([]);
 
   const handleSubmit = async (e: React.SubmitEvent) => {
@@ -52,11 +53,13 @@ const ApprovalWrite = () => {
           const defaultData: ApprovalResponse = await getApproval(
             Number(fromId),
           );
-          setForm(() => ({
+          const loaded = {
             title: defaultData.title,
             content: defaultData.content,
             approver_id: defaultData.approver.id,
-          }));
+          };
+          setForm(loaded);
+          setOriginal(loaded);
         }
         const data = await getApprovers();
         setApproverList(data);
@@ -82,6 +85,12 @@ const ApprovalWrite = () => {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
+
+  const isUnchanged =
+    original !== null &&
+    form.title.trim() === original.title.trim() &&
+    form.content.trim() === original.content.trim() &&
+    form.approver_id === original.approver_id;
   return (
     <div>
       {/* 반려된 문서에서 「재작성」으로 들어오면(?from=번호) 제목·설명을 바꿔서 알려줌 */}
@@ -147,17 +156,27 @@ const ApprovalWrite = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
-          <button
-            type="button"
-            className={btnSecondary}
-            onClick={() => navigate(-1)}
-          >
-            취소
-          </button>
-          <button type="submit" className={btnPrimary}>
-            기안
-          </button>
+        <div className="border-t border-slate-100 px-6 py-4">
+          {/* 재작성인데 바뀐 내용이 없으면 기안 버튼 위에 안내 메세지 보여주기 (로그인 에러 메세지와 같은 모양)
+              w-fit: 배경을 글자 길이만큼만, ml-auto: 오른쪽(기안 버튼 쪽)으로 붙임 */}
+          {isUnchanged && (
+            <div className="mb-3 ml-auto w-fit rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-600">
+              바뀐 내용이 없습니다.
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              className={btnSecondary}
+              onClick={() => navigate(-1)}
+            >
+              취소
+            </button>
+            <button type="submit" className={btnPrimary} disabled={isUnchanged}>
+              기안
+            </button>
+          </div>
         </div>
       </form>
     </div>

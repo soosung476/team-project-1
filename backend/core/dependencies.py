@@ -33,6 +33,7 @@ def get_current_user(
     return user
 
 
+# 만약 role이 admin이 아닌 사람이 다른 사람을 수정하려 하면, Router에서 받을 때, 해당 오류가 나타남.
 def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
     if current_user.role != "ADMIN":
         raise HTTPException(

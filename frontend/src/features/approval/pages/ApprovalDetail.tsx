@@ -32,6 +32,7 @@ const ApprovalDetail = () => {
       return;
     }
     try {
+      // putApproval로 들어가는 순간, COMPLETED_AT 의 데이터가 자동으로 추가.
       await putApproval(Number(id), {
         status: status,
       });
