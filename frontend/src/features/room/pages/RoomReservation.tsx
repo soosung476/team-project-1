@@ -7,11 +7,12 @@ import { useEffect, useState } from "react";
 import { getRoomReservations, getRooms, getRoomSlots, postReservation } from "../apis/roomApi";
 import { useAuth } from "../../user/context/AuthContext";
 import MyReservations from "../components/MyReservations";
-import { getToday, toHHMM } from "../utils/time";
+import { getMaxDate,getToday, toHHMM } from "../utils/time";
 import { getErrorMessage, getErrorStatus } from "../utils/error";
 import { LuMapPin, LuUsers } from "react-icons/lu";
 import PageHeader from "../../../common/components/PageHeader";
 import { btnPrimary, card, cardHeader, cardTitle, input, tabStyle } from "../../../common/style";
+
 
 const RoomReservation = () => {
   const { user } = useAuth(); //유저
@@ -51,11 +52,16 @@ const RoomReservation = () => {
 
   // 회의실·날짜가 바뀔 때마다: 30분 단위 시간 칸(예약 가능 여부) 다시 불러오기 (회의실 선택 전이면 건너뜀)
   useEffect(() => {
-    if(selectedRoomId == null) return;
-    getRoomSlots(selectedRoomId,selectedDate).then((data) =>{
-      setSlots(data);
-    });
-  },[selectedRoomId, selectedDate]);
+    if (selectedRoomId == null) return;
+    getRoomSlots(selectedRoomId, selectedDate)
+      .then((data) => {
+        setSlots(data);
+      })
+      .catch((err) => {
+        setSlots([]); // 옛날 칸 지우기
+        setMessage(getErrorMessage(err, "시간표를 불러오지 못했습니다."));
+      });
+  }, [selectedRoomId, selectedDate]);
 
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
   const startAt = selectedSlots[0];                         
@@ -158,6 +164,7 @@ const RoomReservation = () => {
                 type="date"
                 value={selectedDate}
                 min={getToday()}
+                max={getMaxDate()}
 
                 onChange={(e) => {
                   setSelectedDate(e.target.value);  // 날짜 선택
