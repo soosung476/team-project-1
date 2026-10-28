@@ -35,9 +35,14 @@ const BoardList = () => {
   const endPage = Math.min(startPage + pageSize - 1, total_pages);
 
   // 검색
-  const [searchForm, setSearchForm] = useState({ criteria: criParam, keyword: keyParam });
+  const [searchForm, setSearchForm] = useState({
+    criteria: criParam,
+    keyword: keyParam,
+  });
   const { criteria, keyword } = searchForm;
-  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const onSearchChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setSearchForm((prev) => ({
       ...prev,
@@ -82,7 +87,11 @@ const BoardList = () => {
   if (!isLoggedIn) {
     return (
       <div>
-        <PageHeader title="자유게시판" description="다양한 이야기를 자유롭게 나눠보세요." breadcrumb={["게시판"]} />
+        <PageHeader
+          title="자유게시판"
+          description="다양한 이야기를 자유롭게 나눠보세요."
+          breadcrumb={["게시판"]}
+        />
         <div className={`${card} p-12 text-center`}>
           <p className="text-slate-600">로그인이 필요합니다.</p>
           <Link to="/users/signin" className={`${btnPrimary} mt-4`}>
@@ -96,7 +105,11 @@ const BoardList = () => {
   // 불러오는 중(loading)에는 아래 표 자리만 바꿈 → 제목·검색창은 그대로 보여서 화면이 깜빡이지 않음
   return (
     <div>
-      <PageHeader title="자유게시판" description="다양한 이야기를 자유롭게 나눠보세요." breadcrumb={["게시판"]}>
+      <PageHeader
+        title="자유게시판"
+        description="다양한 이야기를 자유롭게 나눠보세요."
+        breadcrumb={["게시판"]}
+      >
         {isLoggedIn && (
           <Link to="/boards/write" className={btnPrimary}>
             글쓰기
@@ -111,7 +124,12 @@ const BoardList = () => {
         </p>
 
         <div className="flex w-full max-w-md gap-2">
-          <select value={criteria} name="criteria" onChange={onSearchChange} className={input}>
+          <select
+            value={criteria}
+            name="criteria"
+            onChange={onSearchChange}
+            className={input}
+          >
             <option value={"tc"}>제목 + 내용</option>
             <option value={"t"}>제목</option>
             <option value={"w"}>작성자</option>
@@ -159,14 +177,19 @@ const BoardList = () => {
             <tbody className="divide-y divide-slate-100">
               {data.items.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-slate-400">
+                  <td
+                    colSpan={5}
+                    className="px-4 py-12 text-center text-slate-400"
+                  >
                     게시글이 없습니다.
                   </td>
                 </tr>
               )}
               {data.items.map((post) => (
                 <tr key={post.id} className="transition hover:bg-slate-50">
-                  <td className={`${td} text-center text-slate-400`}>{post.id}</td>
+                  <td className={`${td} text-center text-slate-400`}>
+                    {post.id}
+                  </td>
 
                   <td className={td}>
                     <Link
@@ -177,11 +200,17 @@ const BoardList = () => {
                     </Link>
                   </td>
 
-                  <td className={`${td} text-center text-slate-600`}>{post.author.name}</td>
+                  <td className={`${td} text-center text-slate-600`}>
+                    {post.author.name}
+                  </td>
 
-                  <td className={`${td} text-center text-slate-400`}>{post.created_at.slice(0, 10)}</td>
+                  <td className={`${td} text-center text-slate-400`}>
+                    {post.created_at.slice(0, 10)}
+                  </td>
 
-                  <td className={`${td} text-center text-slate-400`}>{post.view_count}</td>
+                  <td className={`${td} text-center text-slate-400`}>
+                    {post.view_count}
+                  </td>
                 </tr>
               ))}
             </tbody>

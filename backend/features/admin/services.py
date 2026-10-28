@@ -49,19 +49,23 @@ def update_user(user_id: int, data: AdminUserUpdate, db: Session, admin: User):
     if user is None:
         raise UserNotFoundException
 
+    # Role 자체를 프론트 코드에서 USER, ADMIN으로 막아놨지만, 그럼에도 불구하고, 다른 데이터가 들어올 경우 익셉션
     if data.role is not None:
         if data.role not in ("USER", "ADMIN"):
             raise InvalidRoleException
 
+        # 관리자가 자신의 권한을 수정하지 못하게 함.
         if user.id == admin.id and data.role != user.role:
             raise SelfRoleChangeException
         user.role = data.role
 
+    # 포지션의 경우 사원, 팀장, 사장만 있음.
     if data.position is not None:
         if data.position not in POSITION_LEVEL:
             raise InvalidPositionException
         user.position = data.position
 
+    # 없는 부서를 선택한 경우 에러.
     if data.department_id is not None:
         if db.get(Department, data.department_id) is None:
             raise DepartmentNotFoundException
