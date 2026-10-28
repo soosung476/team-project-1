@@ -225,7 +225,13 @@ const RoomReservation = () => {
                         if(reservation || !slot.available) return;
 
                         if (isSelected) {                     
-                          setSelectedSlots([]);
+                          if (slot.start_at === startAt) {          // 맨 앞 칸?
+                            setSelectedSlots(selectedSlots.slice(1));
+                          } else if (slot.start_at === selectedSlots[selectedSlots.length - 1]) {   // 맨 뒤 칸?
+                            setSelectedSlots(selectedSlots.slice(0, -1));
+                          } else {                                 // 가운데 칸
+                            setSelectedSlots([]);
+                          }
                         } else if (slot.start_at === endAt) {    
                           setSelectedSlots([...selectedSlots, slot.start_at]);
                         } else if (slot.end_at === startAt) {      
