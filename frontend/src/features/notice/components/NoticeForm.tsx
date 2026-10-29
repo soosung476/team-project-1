@@ -17,6 +17,8 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
   );
   // form 안의 값을 꺼내서 사용
   const { title, content, is_pinned } = form;
+  // 제목·내용이 비면 Oracle이 ''를 NULL로 저장하려다 서버 500 오류가 나서 버튼을 막음
+  const isInvalid = title.trim() === "" || content.trim() === "";
 
   // 수정 하면 서버에서 받아 온 내용을 form 상태에 동기화
   useEffect(() => {
@@ -96,6 +98,8 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
               value={title}
               name="title"
               type="text"
+              // 제목은 DB에 String(200)이라 200자까지만 입력
+              maxLength={200}
               placeholder="제목을 입력하세요"
               className={`${input} w-full`}
             />
@@ -124,11 +128,11 @@ const NoticeForm = ({ onSubmit, notice }: { onSubmit: (notice: NoticeUpdate) => 
 
           {/* 버튼을 누르면 onSubmit */}
           {!notice ? (
-            <button type="submit" className={btnPrimary}>
+            <button type="submit" disabled={isInvalid} className={btnPrimary}>
               작성
             </button>
           ) : (
-            <button type="submit" className={btnPrimary}>
+            <button type="submit" disabled={isInvalid} className={btnPrimary}>
               수정
             </button>
           )}

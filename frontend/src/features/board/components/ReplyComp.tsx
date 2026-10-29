@@ -10,6 +10,10 @@ import {
   cardTitle,
   input,
 } from "../../../common/style";
+
+// 댓글은 DB에 String(1000)으로 저장되어 1000자를 넘으면 서버 500 오류가 남
+const MAX_COMMENT_LENGTH = 1000;
+
 export type ReplyProps = {
   comment: CommentResponse[];
   handleCommentRemove: (commentId: number) => void;
@@ -23,6 +27,8 @@ const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCo
   const canManage = (authorId: number) => user?.id === authorId || isAdmin;
 
   const [commentContent, setCommentContent] = useState("");
+  // 빈 댓글(공백만 있는 것 포함)도 서버 500 오류가 나서 등록 버튼을 막음
+  const isCommentInvalid = commentContent.trim() === "" || commentContent.length > MAX_COMMENT_LENGTH;
   const handleCommentSubmitWrapper = () => {
     handleCommentSubmit(commentContent);
     setCommentContent("");
@@ -30,6 +36,7 @@ const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCo
 
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
+  const isEditInvalid = editContent.trim() === "" || editContent.length > MAX_COMMENT_LENGTH;
   const handleEditSaveWrapper = (commnetId: number) => {
     handleCommentEdit(commnetId, editContent);
     setEditingCommentId(null);
@@ -107,12 +114,22 @@ const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCo
                     className={`${input} min-h-25 w-full resize-none`}
                   />
 
+                  {editContent.length > MAX_COMMENT_LENGTH && (
+                    <p className="mt-1 text-xs text-red-500">
+                      댓글은 {MAX_COMMENT_LENGTH}자까지 입력할 수 있습니다. (현재 {editContent.length}자)
+                    </p>
+                  )}
+
                   <div className="mt-2 flex justify-end gap-2">
                     <button onClick={() => handleEditCancel()} className={btnSecondarySm}>
                       취소
                     </button>
 
-                    <button onClick={() => handleEditSaveWrapper(comment.id)} className={btnPrimarySm}>
+                    <button
+                      onClick={() => handleEditSaveWrapper(comment.id)}
+                      disabled={isEditInvalid}
+                      className={btnPrimarySm}
+                    >
                       저장
                     </button>
                   </div>
@@ -136,10 +153,19 @@ const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCo
             className={`${input} min-h-16 flex-1 resize-none`}
             onChange={(e) => setCommentContent(e.target.value)}
           />
-          <button className={`${btnPrimary} self-end`} onClick={() => handleCommentSubmitWrapper()}>
+          <button
+            className={`${btnPrimary} self-end`}
+            onClick={() => handleCommentSubmitWrapper()}
+            disabled={isCommentInvalid}
+          >
             댓글 등록
           </button>
         </div>
+        {commentContent.length > MAX_COMMENT_LENGTH && (
+          <p className="mt-1 text-xs text-red-500">
+            댓글은 {MAX_COMMENT_LENGTH}자까지 입력할 수 있습니다. (현재 {commentContent.length}자)
+          </p>
+        )}
       </div>
     </section>
   );

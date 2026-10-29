@@ -1,4 +1,3 @@
-import axios from "axios";
 import type { CommentCreate, CommentUpdate } from "../types/board";
 import axiosInstance from "../../../common/apis/axios";
 

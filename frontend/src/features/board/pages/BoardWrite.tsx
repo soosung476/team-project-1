@@ -14,6 +14,7 @@ const BoardWrite = () => {
       navigate(`/boards?page=1&size=${size}`);
     } catch (error: any) {
       console.log(JSON.stringify(error.response?.data, null, 2));
+      alert("게시글 작성에 실패했습니다.");
     }
   };
 

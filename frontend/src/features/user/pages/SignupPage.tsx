@@ -50,7 +50,7 @@ const SignupPage = () => {
 
     try {
       const result = await signup({ email, password, name });
-      alert(`${result.id}님 ${result.message}`);
+      alert(`${name}님 ${result.message}`);
       navigate("/users/signin");
     } catch (error) {
       if (axios.isAxiosError(error)) {
