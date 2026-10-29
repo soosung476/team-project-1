@@ -14,7 +14,8 @@ class Settings(BaseSettings):
     oracle_dsn: str = Field(alias="ORACLE_DSN")
     secret_key: str = Field(alias="SECRET_KEY")
     jwt_algorithm: str = "HS256"
-    access_token_expire_seconds: int = 3600
+    access_token_expire_seconds: int = 1800
+    refresh_token_expire_seconds: int = 7200
 
 
 settings = Settings()

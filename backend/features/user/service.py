@@ -1,7 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from core.security import verify_password, hash_password
-from core.jwt_token import create_access_token
+from core.jwt_token import (
+    create_access_token,
+    create_refresh_token,
+    decode_refresh_token,
+)
 from features.user.models import User
 from features.user.exceptions import (
     UserNotFoundException,
@@ -45,4 +49,15 @@ def authenticate(db: Session, data: UserLogin):
         raise InvalidPasswordException
 
     access_token = create_access_token(data={"sub": str(user.id)})
-    return Token(access_token=access_token)
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+    return Token(access_token=access_token, refresh_token=refresh_token)
+
+
+def reissue_token(db: Session, refresh_token: str) -> Token:
+    user_id = decode_refresh_token(refresh_token)
+    user = get_user(db=db, user_id=user_id)
+
+    return Token(
+        access_token=create_access_token(data={"sub": str(user.id)}),
+        refresh_token=create_refresh_token(data={"sub": str(user.id)}),
+    )

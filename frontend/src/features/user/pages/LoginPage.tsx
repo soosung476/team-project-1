@@ -34,6 +34,7 @@ const LoginPage = () => {
       const result = await signin(loginForm);
       console.log(result);
       sessionStorage.setItem("access_token", result.access_token);
+      sessionStorage.setItem("refresh_token", result.refresh_token);
       const currentUser = await getCurrentUser();
       console.log(currentUser);
 
@@ -45,7 +46,9 @@ const LoginPage = () => {
       if (axios.isAxiosError(error) && error.response) {
         const detail = error.response.data.detail;
         // 입력 형식 오류(422)는 detail이 글자가 아니라 배열이라 그대로 못 보여줌 → 안내 문장으로 바꿈
-        setErrorMessage(typeof detail === "string" ? detail : "이메일 형식을 확인해주세요.");
+        setErrorMessage(
+          typeof detail === "string" ? detail : "이메일 형식을 확인해주세요.",
+        );
       } else {
         setErrorMessage("서버에 연결할 수 없습니다.");
       }
@@ -57,7 +60,9 @@ const LoginPage = () => {
     <div>
       <h1 className="text-2xl font-bold tracking-tight">로그인</h1>
 
-      <p className="mt-1 mb-8 text-sm text-slate-500">팀웍스 계정으로 로그인하세요.</p>
+      <p className="mt-1 mb-8 text-sm text-slate-500">
+        팀웍스 계정으로 로그인하세요.
+      </p>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
