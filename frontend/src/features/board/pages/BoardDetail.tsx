@@ -61,10 +61,11 @@ const BoardDetail = () => {
       console.log(result);
       refresh();
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log("422 detail:", JSON.stringify(error.response?.data, null, 2));
+      // 공백·1000자 초과는 ReplyComp의 버튼 disabled로 먼저 막음
+      if (axios.isAxiosError(error) && error.response) {
+        alert(error.response.data.detail);
       } else {
-        console.log(error);
+        alert("댓글 작성에 실패했습니다.");
       }
     }
   };
@@ -76,7 +77,11 @@ const BoardDetail = () => {
       console.log(result);
       refresh();
     } catch (error) {
-      console.log(error);
+      if (axios.isAxiosError(error) && error.response) {
+        alert(error.response.data.detail);
+      } else {
+        alert("댓글 수정에 실패했습니다.");
+      }
     }
   };
 

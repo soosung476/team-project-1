@@ -1,4 +1,5 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import { put_notice } from "../apis/noticeApi";
 import NoticeForm from "../components/NoticeForm";
 import useNotice from "../hooks/useNotice";
@@ -29,7 +30,11 @@ const NoticeEdit = () => {
         search: `?page=${Page}&size=${Size}`,
       });
     } catch (error) {
-      console.log(error);
+      if (axios.isAxiosError(error) && error.response) {
+        alert(error.response.data.detail);
+      } else {
+        alert("공지 수정에 실패했습니다.");
+      }
     }
   };
 

@@ -21,6 +21,7 @@ import {
     label,
 } from "../../../common/style";
 import { useAuth } from "../../user/context/AuthContext";
+import axios from "axios";
 
 
 export default function DepartmentPage() {
@@ -44,9 +45,23 @@ export default function DepartmentPage() {
     }, [user]);
     
     const handleCreate = async () => {
-        const createdDept = await CreateDepartment({ name: newName});
-        setDepartments([...departments, createdDept]);
-        setNewName("");
+        // 공백만 있는 이름은 서버로 보내면 500이 나서 화면에서 먼저 막음
+        if (newName.trim() === "") {
+            alert("공백으로는 제출할 수 없습니다.");
+            return;
+        }
+        try {
+            const createdDept = await CreateDepartment({ name: newName});
+            setDepartments([...departments, createdDept]);
+            setNewName("");
+        } catch (error) {
+            // 409(같은 이름)는 서버가 detail에 문장을 보내 줌
+            if (axios.isAxiosError(error) && error.response) {
+                alert(error.response.data.detail);
+            } else {
+                alert("부서 추가에 실패했습니다.");
+            }
+        }
     };
 
     const handleDelete = async (id : number) => {
@@ -59,13 +74,24 @@ export default function DepartmentPage() {
     };
     
     const handleUpdate = async (id: number)=>{
-        if (!editName) return;
-        await UpdateDepartment(
-            id, {
-                name: editName
-            });
-        setEditingId(null);
-        fetchDepartments();
+        if (editName.trim() === "") {
+            alert("공백으로는 제출할 수 없습니다.");
+            return;
+        }
+        try {
+            await UpdateDepartment(
+                id, {
+                    name: editName
+                });
+            setEditingId(null);
+            fetchDepartments();
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                alert(error.response.data.detail);
+            } else {
+                alert("부서 수정에 실패했습니다.");
+            }
+        }
     };
 
     if (loading) return null;
@@ -93,6 +119,8 @@ export default function DepartmentPage() {
                     <input
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
+                        // DB 컬럼 String(50)이라 50자까지만 입력되게 함 (넘으면 서버 500)
+                        maxLength={50}
                         placeholder="새 부서 이름을 입력하세요 (예: 개발팀, 인사팀)"
                         className={`${input} flex-1`}
                     />
@@ -130,6 +158,7 @@ export default function DepartmentPage() {
                                             <input
                                                 value={editName}
                                                 onChange={(e) => setEditName(e.target.value)}
+                                                maxLength={50}
                                                 placeholder="새 부서 이름 입력"
                                                 className={inputSm}
                                             />

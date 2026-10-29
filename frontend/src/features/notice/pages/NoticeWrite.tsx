@@ -1,4 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import { post_notice } from "../apis/noticeApi";
 import NoticeForm from "../components/NoticeForm";
 import type { NoticeCreate } from "../types/notice";
@@ -16,7 +17,12 @@ const NoticeWrite = () => {
       console.log(result);
       navigate(`/notices?page=${1}&size=${size}`);
     } catch (error) {
-      console.log(error);
+      // 공백·200자 초과는 NoticeForm의 버튼 disabled와 maxLength로 먼저 막음
+      if (axios.isAxiosError(error) && error.response) {
+        alert(error.response.data.detail);
+      } else {
+        alert("공지 작성에 실패했습니다.");
+      }
     }
   };
 

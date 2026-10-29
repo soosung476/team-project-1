@@ -31,7 +31,12 @@ const ApprovalWrite = () => {
 
   const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (form.approver_id === 0 || form.title === "" || form.content === "") {
+    // 공백만 있는 제목·내용도 막음 (trim 없이 === ""만 보면 "   "은 통과해서 빈칸 기안이 저장됨)
+    if (
+      form.approver_id === 0 ||
+      form.title.trim() === "" ||
+      form.content.trim() === ""
+    ) {
       alert("내용을 전부 채워주세요");
       return;
     }
@@ -135,6 +140,8 @@ const ApprovalWrite = () => {
               value={form.title}
               type="text"
               onChange={handleChange}
+              // 서버 스키마가 200자까지라 넘으면 422(alert에 [object Object])가 나서 입력부터 막음
+              maxLength={200}
               placeholder="제목을 입력하세요"
               className={`${input} w-full`}
             />
