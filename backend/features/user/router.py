@@ -4,12 +4,19 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from core.dependencies import get_current_user
 from features.user.models import User
-from features.user.schema import UserLogin, Token, UserCreate, UserResponse
-from features.user.service import authenticate, user_register
+from features.user.schema import (
+    UserLogin,
+    Token,
+    UserCreate,
+    UserResponse,
+    RefreshRequest,
+)
+from features.user.service import authenticate, user_register, reissue_token
 from features.user.exceptions import (
     UserNotFoundException,
     InvalidPasswordException,
     UserExistingException,
+    UserCredentialsException,
 )
 
 user_router = APIRouter(prefix="/auth", tags=["Users"])
@@ -47,3 +54,13 @@ async def post_login(data: UserLogin, db: Session = Depends(get_db)) -> Token:
             detail="이메일, 비밀번호를 확인해주세요",
         )
     return token
+
+
+@user_router.post("/refresh", response_model=Token)
+async def post_refresh(data: RefreshRequest, db: Session = Depends(get_db)) -> Token:
+    try:
+        return reissue_token(db=db, refresh_token=data.refresh_token)
+    except UserCredentialsException, UserNotFoundException:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="다시 로그인해 주세요"
+        )

@@ -12,6 +12,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   const logout = () => {
     sessionStorage.removeItem("access_token");
+    sessionStorage.removeItem("refresh_token");
     setUser(null);
   };
   const value = {
