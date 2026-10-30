@@ -156,6 +156,8 @@ const ApprovalWrite = () => {
               value={form.content}
               rows={12}
               onChange={handleChange}
+              // 서버·DB에는 길이 제한이 없어서 화면에서 5000자로 막음
+              maxLength={5000}
               placeholder="내용을 입력하세요"
               className={`${input} w-full resize-none leading-6`}
             />
