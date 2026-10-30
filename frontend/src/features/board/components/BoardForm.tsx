@@ -11,6 +11,8 @@ const BoardForm = ({ onSubmit, board }: { onSubmit: (board: BoardCreate) => void
     content: board?.content ?? "",
   });
   const { title, content } = form;
+  // 공백만 있는 제목·내용은 서버를 통과해서 빈칸 글이 저장되므로 버튼을 막음
+  const isInvalid = title.trim() === "" || content.trim() === "";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,6 +42,8 @@ const BoardForm = ({ onSubmit, board }: { onSubmit: (board: BoardCreate) => void
             <input
               name="title"
               type="text"
+              // 서버 스키마가 60자까지라 넘으면 422가 나서 입력부터 막음
+              maxLength={60}
               placeholder="제목을 입력하세요"
               value={title}
               onChange={(e) => handleChange(e)}
@@ -54,6 +58,8 @@ const BoardForm = ({ onSubmit, board }: { onSubmit: (board: BoardCreate) => void
             <textarea
               name="content"
               rows={12}
+              // 서버·DB에는 길이 제한이 없어서 화면에서 5000자로 막음
+              maxLength={5000}
               placeholder="내용을 입력하세요"
               value={content}
               onChange={(e) => handleChange(e)}
@@ -68,11 +74,11 @@ const BoardForm = ({ onSubmit, board }: { onSubmit: (board: BoardCreate) => void
             취소
           </button>
           {!board ? (
-            <button type="submit" className={btnPrimary}>
+            <button type="submit" disabled={isInvalid} className={btnPrimary}>
               작성
             </button>
           ) : (
-            <button type="submit" className={btnPrimary}>
+            <button type="submit" disabled={isInvalid} className={btnPrimary}>
               수정
             </button>
           )}

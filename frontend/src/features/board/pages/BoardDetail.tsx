@@ -112,7 +112,7 @@ const BoardDetail = () => {
 
         {/* Content */}
         <div className="min-h-48 px-6 py-6 leading-7 text-slate-700">
-          <p className="whitespace-pre-wrap wrap-break-words">{board.content}</p>
+          <p className="whitespace-pre-wrap wrap-break-word">{board.content}</p>
         </div>
 
         {/* Buttons */}

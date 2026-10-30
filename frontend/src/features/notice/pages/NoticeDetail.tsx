@@ -52,7 +52,7 @@ const NoticeDetail = () => {
 
         {/* Content: 줄바꿈을 입력한 그대로 보여줌(whitespace-pre-wrap) */}
         <div className="min-h-48 px-6 py-6 leading-7 text-slate-700">
-          <p className="whitespace-pre-wrap">{data.content}</p>
+          <p className="whitespace-pre-wrap wrap-break-word">{data.content}</p>
         </div>
 
         {/* Buttons */}

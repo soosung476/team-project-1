@@ -136,7 +136,7 @@ const ReplyComp = ({ comment, handleCommentRemove, handleCommentSubmit, handleCo
                 </div>
               ) : (
                 // 왼쪽 동그란 프로필(32px) + 간격만큼 들여 씀
-                <p className="mt-2 pl-11 whitespace-pre-wrap text-sm leading-6 text-slate-700">{comment.content}</p>
+                <p className="mt-2 pl-11 whitespace-pre-wrap wrap-break-word text-sm leading-6 text-slate-700">{comment.content}</p>
               )}
             </div>
           ))
